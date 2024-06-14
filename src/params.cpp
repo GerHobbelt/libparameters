@@ -1,7 +1,10 @@
 
 #include <parameters/parameters.h>
+#include <parameters/CString.hpp>
+#include <parameters/ConfigFile.hpp>
+#include <parameters/ReportFile.hpp>
 
-#include "internal_helpers.h"
+#include <libassert/assert.hpp>		// we use libassert for our assertions
 
 #include <fmt/base.h>
 #include <fmt/format.h>
@@ -17,12 +20,17 @@
 #include <exception>
 #include <cctype>  // for std::toupper
 #include <type_traits>
+#include <cerrno>
+#include <cstdint>
+#include <string>
+#include <vector>
+#include <variant>
+#include <unordered_map>
+#include <memory>
 
-#if defined(HAVE_MUPDF)
-#include "mupdf/assertions.h"
-#endif
 
 #ifdef _WIN32
+#define NOMINMAX
 #  include <windows.h>
 #  define strcasecmp _stricmp
 #  define strncasecmp _strnicmp
@@ -30,11 +38,17 @@
 #  include <strings.h>
 #endif
 
+#include "helpers.h"
+
+#ifndef E_OK
+#define E_OK 0
+#endif
+
+
 
 namespace parameters {
 
-	TESS_API
-		ParamsVector &GlobalParams() {
+	ParamsVector &GlobalParams() {
 		static ParamsVector global_params("global"); // static auto-inits at startup
 		return global_params;
 	}
@@ -142,7 +156,7 @@ namespace parameters {
 	}
 	// calculate hash:
 	std::size_t ParamHash::operator()(const char * s) const noexcept {
-		ASSERT0(s != nullptr);
+		DEBUG_ASSERT(s != nullptr);
 		uint32_t h = 1;
 		for (const char *p = s; *p; p++) {
 			uint32_t c = std::toupper(static_cast<unsigned char>(*p));
@@ -156,14 +170,14 @@ namespace parameters {
 
 	// equal_to:
 	bool ParamHash::operator()(const Param& lhs, const Param& rhs) const noexcept {
-		ASSERT0(lhs.name_str() != nullptr);
-		ASSERT0(rhs.name_str() != nullptr);
+		DEBUG_ASSERT(lhs.name_str() != nullptr);
+		DEBUG_ASSERT(rhs.name_str() != nullptr);
 		return ParamHash()(lhs.name_str(), rhs.name_str());
 	}
 	// equal_to:
 	bool ParamHash::operator()(const char * lhs, const char * rhs) const noexcept {
-		ASSERT0(lhs != nullptr);
-		ASSERT0(rhs != nullptr);
+		DEBUG_ASSERT(lhs != nullptr);
+		DEBUG_ASSERT(rhs != nullptr);
 		for (; *lhs; lhs++, rhs++) {
 			uint32_t c = std::toupper(static_cast<unsigned char>(*lhs));
 			if (c == '-')
@@ -174,7 +188,7 @@ namespace parameters {
 			if (c != d)
 				return false;
 		}
-		ASSERT0(*lhs == 0);
+		DEBUG_ASSERT(*lhs == 0);
 		return *rhs == 0;
 	}
 
@@ -190,8 +204,8 @@ namespace parameters {
 	}
 	// compare as a-less-b? for purposes of std::sort et al:
 	bool ParamComparer::operator()(const char * lhs, const char * rhs) const {
-		ASSERT0(lhs != nullptr);
-		ASSERT0(rhs != nullptr);
+		DEBUG_ASSERT(lhs != nullptr);
+		DEBUG_ASSERT(rhs != nullptr);
 		for (; *lhs; lhs++, rhs++) {
 			uint32_t c = std::toupper(static_cast<unsigned char>(*lhs));
 			if (c == '-')
@@ -203,7 +217,7 @@ namespace parameters {
 			if (c != d)
 				return d == 0 ? true : (c < d);
 		}
-		ASSERT0(*lhs == 0);
+		DEBUG_ASSERT(*lhs == 0);
 		return *rhs == 0;
 	}
 
@@ -736,7 +750,7 @@ namespace parameters {
 			return "integer";
 
 		default:
-			assert(0);
+			DEBUG_ASSERT(0);
 			return nullptr;
 		}
 	}
@@ -1059,7 +1073,7 @@ namespace parameters {
 			return "boolean";
 
 		default:
-			assert(0);
+			DEBUG_ASSERT(0);
 			return nullptr;
 		}
 	}
@@ -1361,7 +1375,7 @@ namespace parameters {
 			return "floating point";
 
 		default:
-			assert(0);
+			DEBUG_ASSERT(0);
 			return nullptr;
 		}
 	}
@@ -1544,7 +1558,7 @@ namespace parameters {
 			return "string";
 
 		default:
-			assert(0);
+			DEBUG_ASSERT(0);
 			return nullptr;
 		}
 	}
@@ -1777,7 +1791,7 @@ namespace parameters {
 		// This helps simplify and speed up the suffix checks below.
 		*vs++ = 0;
 		strcpy(vs, svs);
-		assert(vs[slen] == 0);
+		DEBUG_ASSERT(vs[slen] == 0);
 
 		// start parsing: `vs` points 1 NUL sentinel past the start of the allocated buffer space.
 
@@ -1830,7 +1844,7 @@ namespace parameters {
 		}
 
 		// now `s` points at the first value in the input string and `e` points at the end sentinel, just beyond the last value in the input string.
-		assert(s == e ? *s == 0 : *s != 0);
+		DEBUG_ASSERT(s == e ? *s == 0 : *s != 0);
 		new_value.clear();
 		const char *delimiters = assistant.parse_separators.c_str();
 		while (s < e) {
@@ -1906,7 +1920,7 @@ namespace parameters {
 			return "set of strings";
 
 		default:
-			assert(0);
+			DEBUG_ASSERT(0);
 			return nullptr;
 		}
 	}
@@ -2124,7 +2138,7 @@ namespace parameters {
 		// This helps simplify and speed up the suffix checks below.
 		*vs++ = 0;
 		strcpy(vs, svs);
-		assert(vs[slen] == 0);
+		DEBUG_ASSERT(vs[slen] == 0);
 
 		// start parsing: `vs` points 1 NUL sentinel past the start of the allocated buffer space.
 
@@ -2177,7 +2191,7 @@ namespace parameters {
 		}
 
 		// now `s` points at the first value in the input string and `e` points at the end sentinel, just beyond the last value in the input string.
-		assert(s == e ? *s == 0 : *s != 0);
+		DEBUG_ASSERT(s == e ? *s == 0 : *s != 0);
 		new_value.clear();
 		const char *delimiters = assistant.parse_separators.c_str();
 		while (s < e) {
@@ -2314,7 +2328,7 @@ namespace parameters {
 			return "set of integers";
 
 		default:
-			assert(0);
+			DEBUG_ASSERT(0);
 			return nullptr;
 		}
 	}
@@ -2501,15 +2515,15 @@ namespace parameters {
 																	ParamSetBySourceType source_type,
 																	ParamPtr source
 	) {
-		TFile fp;
-		if (!fp.Open(file.c_str(), nullptr)) {
+		ConfigFile fp(file);
+		if (!fp()) {
 			tprintError("read_params_file: Can't open/read file {}\n", file);
 			return true;
 		}
-		return ReadParamsFromFp(&fp, member_params, source_type, source);
+		return ReadParamsFromFp(fp, member_params, source_type, source);
 	}
 
-	bool ParamUtils::ReadParamsFromFp(TFile *fp,
+	bool ParamUtils::ReadParamsFromFp(ConfigFile &fp,
 																		const ParamsVectorSet &member_params,
 																		ParamSetBySourceType source_type,
 																		ParamPtr source) {
@@ -2521,7 +2535,7 @@ namespace parameters {
 		char *valptr;         // value field
 		unsigned linecounter = 0;
 
-		while (fp->FGets(line, LINE_SIZE) != nullptr) {
+		while (fp.ReadLine(line, LINE_SIZE)) {
 			linecounter++;
 
 			// trimRight:
@@ -2671,7 +2685,7 @@ namespace parameters {
 					if (param != nullptr) {
 						switch (param->type()) {
 						case INT_PARAM:
-							assert(0);
+							DEBUG_ASSERT(0);
 							break;
 
 						case BOOL_PARAM: {
@@ -2751,7 +2765,7 @@ namespace parameters {
 			if (param != nullptr) {
 				switch (param->type()) {
 				case BOOL_PARAM:
-					assert(0);
+					DEBUG_ASSERT(0);
 					break;
 
 				case INT_PARAM: {
@@ -2831,7 +2845,7 @@ namespace parameters {
 			if (param != nullptr) {
 				switch (param->type()) {
 				case DOUBLE_PARAM:
-					assert(0);
+					DEBUG_ASSERT(0);
 					break;
 
 				case BOOL_PARAM: {
@@ -3220,7 +3234,7 @@ namespace parameters {
 							if (rv == 0)
 							{
 								fprintf(stderr, "Apparently you have double-defined {} Variable: '%s'! Fix that in the source code!\n", ParamUtils::GetApplicationName(), a.p->name_str());
-								ASSERT0(!"Apparently you have double-defined a Variable.");
+								DEBUG_ASSERT(!"Apparently you have double-defined a Variable.");
 							}
 #endif
 						}
