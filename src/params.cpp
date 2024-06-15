@@ -48,6 +48,102 @@
 
 namespace parameters {
 
+#if 0
+	// https://stackoverflow.com/questions/7852101/c-lambda-with-captures-as-a-function-pointer
+
+
+	struct Lambda {
+		template<typename Tret, typename T>
+		static Tret lambda_ptr_exec(void* data) {
+			return (Tret)(*(T*)fn<T>())(data);
+		}
+
+		template<typename Tret = void, typename Tfp = Tret(*)(void*), typename T>
+		static Tfp ptr(T& t) {
+			fn<T>(&t);
+			return (Tfp)lambda_ptr_exec<Tret, T>;
+		}
+
+		template<typename T>
+		static void* fn(void* new_fn = nullptr) {
+			static void* fn;
+			if (new_fn != nullptr)
+				fn = new_fn;
+			return fn;
+		}
+	};
+
+	static void demo(void) {
+		int a = 100;
+		auto b = [&](void*) {return ++a;};
+
+		void (*f1)(void*) = Lambda::ptr(b);
+		f1(nullptr);
+		printf("%d\n", a);  // 101 
+
+		auto f2 = Lambda::ptr(b);
+		f2(nullptr);
+		printf("%d\n", a); // 102
+
+		int (*f3)(void*) = Lambda::ptr<int>(b);
+		printf("%d\n", f3(nullptr)); // 103
+
+		auto b2 = [&](void* data) {return *(int*)(data)+ a;};
+		int (*f4)(void*) = Lambda::ptr<int>(b2);
+		int data = 5;
+		printf("%d\n", f4(&data)); // 108
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// Original ftw function taking raw function pointer that cannot be modified
+
+	int ftw(const char *fpath, int(*callback)(const char *path)) {
+		return callback(fpath);
+	}
+
+	static std::function<int(const char*path)> ftw_callback_function;
+
+	static int ftw_callback_helper(const char *path) {
+		return ftw_callback_function(path);
+	}
+
+	// ftw overload accepting lambda function
+	static int ftw(const char *fpath, std::function<int(const char *path)> callback) {
+		ftw_callback_function = callback;
+		return ftw(fpath, ftw_callback_helper);
+	}
+
+	static void demo2(void) {
+		std::vector<std::string> entries;
+
+		std::function<int (const char *fpath)> callback = [&](const char *fpath) -> int {
+			entries.push_back(fpath);
+			return 0;
+			};
+		int ret = ftw("/etc", callback);
+
+		for (auto entry : entries) {
+			printf("%s\n", entry.c_str());
+		}
+	}
+#endif
+
+
+
+
+
+
 	ParamsVector &GlobalParams() {
 		static ParamsVector global_params("global"); // static auto-inits at startup
 		return global_params;

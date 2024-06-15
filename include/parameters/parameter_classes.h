@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <functional>
 
 
 namespace parameters {
@@ -427,21 +428,26 @@ namespace parameters {
 		using Param::operator=;
 
 		// Return when modify/write action may proceed; throw an exception on (non-recovered) error. `new_value` MAY have been adjusted by this modify handler. The modify handler is not supposed to modify any read/write/modify access accounting data. Minor infractions (which resulted in some form of recovery) may be signaled by flagging the parameter state via its fault() API method.
-		typedef void (*ParamOnModifyFunction)(RTP &target, const T old_value, T &new_value, const T default_value, ParamSetBySourceType source_type, ParamPtr optional_setter);
+		typedef void ParamOnModifyCFunction(RTP &target, const T old_value, T &new_value, const T default_value, ParamSetBySourceType source_type, ParamPtr optional_setter);
 
 		// Return when validation action passed and modify/write may proceed; throw an exception on (non-recovered) error. `new_value` MAY have been adjusted by this validation handler. The validation handler is not supposed to modify any read/write/modify access accounting data. Minor infractions (which resulted in some form of recovery) may be signaled by flagging the parameter state via its fault() API method.
-		typedef void (*ParamOnValidateFunction)(RTP &target, const T old_value, T &new_value, const T default_value, ParamSetBySourceType source_type);
+		typedef void ParamOnValidateCFunction(RTP &target, const T old_value, T &new_value, const T default_value, ParamSetBySourceType source_type);
 
 		// Return when the parse action (parsing `source_value_str` starting at offset `pos`) completed successfully or required only minor recovery; throw an exception on (non-recovered) error.
 		// `new_value` will contain the parsed value produced by this parse handler, while `pos` will have been moved to the end of the parsed content.
 		// The string parse handler is not supposed to modify any read/write/modify access accounting data.
 		// Minor infractions (which resulted in some form of recovery) may be signaled by flagging the parameter state via its fault() API method.
-		typedef void (*ParamOnParseFunction)(RTP& target, T& new_value, const std::string &source_value_str, unsigned int &pos, ParamSetBySourceType source_type);
+		typedef void ParamOnParseCFunction(RTP& target, T& new_value, const std::string &source_value_str, unsigned int &pos, ParamSetBySourceType source_type);
 
 		// Return the formatted string value, depending on the formatting purpose. The format handler is not supposed to modify any read/write/modify access accounting data.
 		// This formatting action is supposed to always succeed or fail fatally (e.g. out of heap memory) by throwing an exception.
 		// The formatter implementation is not supposed to signal any errors via the fault() API method.
-		typedef std::string (*ParamOnFormatFunction)(const RTP &source, const T value, const T default_value, ValueFetchPurpose purpose);
+		typedef std::string ParamOnFormatCFunction(const RTP &source, const T value, const T default_value, ValueFetchPurpose purpose);
+
+		using ParamOnModifyFunction = std::function<ParamOnModifyCFunction>;
+		using ParamOnValidateFunction = std::function<ParamOnValidateCFunction>;
+		using ParamOnParseFunction = std::function<ParamOnParseCFunction>;
+		using ParamOnFormatFunction = std::function<ParamOnFormatCFunction>;
 
 	public:
 		ValueTypedParam(const T value, THE_4_HANDLERS_PROTO);
@@ -503,18 +509,23 @@ namespace parameters {
 		using Param::operator=;
 
 		// Return true when modify action may proceed. `new_value` MAY have been adjusted by this modify handler. The modify handler is not supposed to modify any read/write/modify access accounting data.
-		typedef void (*ParamOnModifyFunction)(RTP &target, const T &old_value, T &new_value, const T &default_value, ParamSetBySourceType source_type, ParamPtr optional_setter);
+		typedef void ParamOnModifyCFunction(RTP &target, const T &old_value, T &new_value, const T &default_value, ParamSetBySourceType source_type, ParamPtr optional_setter);
 
 		// Return true when validation action passed and modify/write may proceed. `new_value` MAY have been adjusted by this validation handler. The validation handler is not supposed to modify any read/write/modify access accounting data.
-		typedef void (*ParamOnValidateFunction)(RTP &target, const T &old_value, T &new_value, const T &default_value, ParamSetBySourceType source_type);
+		typedef void ParamOnValidateCFunction(RTP &target, const T &old_value, T &new_value, const T &default_value, ParamSetBySourceType source_type);
 
 		// Return true when parse action succeeded (parsing `source_value_str` starting at offset `pos`).
 		// `new_value` will contain the parsed value produced by this parse handler, while `pos` will have been moved to the end of the parsed content.
 		// The string parse handler is not supposed to modify any read/write/modify access accounting data.
-		typedef void (*ParamOnParseFunction)(RTP &target, T &new_value, const std::string &source_value_str, unsigned int &pos, ParamSetBySourceType source_type);
+		typedef void ParamOnParseCFunction(RTP &target, T &new_value, const std::string &source_value_str, unsigned int &pos, ParamSetBySourceType source_type);
 
 		// Return the formatted string value, depending on the formatting purpose. The format handler is not supposed to modify any read/write/modify access accounting data.
-		typedef std::string (*ParamOnFormatFunction)(const RTP &source, const T &value, const T& default_value, ValueFetchPurpose purpose);
+		typedef std::string ParamOnFormatCFunction(const RTP &source, const T &value, const T& default_value, ValueFetchPurpose purpose);
+
+		using ParamOnModifyFunction = std::function<ParamOnModifyCFunction>;
+		using ParamOnValidateFunction = std::function<ParamOnValidateCFunction>;
+		using ParamOnParseFunction = std::function<ParamOnParseCFunction>;
+		using ParamOnFormatFunction = std::function<ParamOnFormatCFunction>;
 
 	public:
 		StringTypedParam(const char *value, THE_4_HANDLERS_PROTO);
@@ -615,18 +626,23 @@ namespace parameters {
 		using Param::operator=;
 
 		// Return true when modify action may proceed. `new_value` MAY have been adjusted by this modify handler. The modify handler is not supposed to modify any read/write/modify access accounting data.
-		typedef void (*ParamOnModifyFunction)(RTP &target, const T &old_value, T &new_value, const T &default_value, ParamSetBySourceType source_type, ParamPtr optional_setter);
+		typedef void ParamOnModifyCFunction(RTP &target, const T &old_value, T &new_value, const T &default_value, ParamSetBySourceType source_type, ParamPtr optional_setter);
 
 		// Return true when validation action passed and modify/write may proceed. `new_value` MAY have been adjusted by this validation handler. The validation handler is not supposed to modify any read/write/modify access accounting data.
-		typedef void (*ParamOnValidateFunction)(RTP &target, const T &old_value, T &new_value, const T &default_value, ParamSetBySourceType source_type);
+		typedef void ParamOnValidateCFunction(RTP &target, const T &old_value, T &new_value, const T &default_value, ParamSetBySourceType source_type);
 
 		// Return true when parse action succeeded (parsing `source_value_str` starting at offset `pos`).
 		// `new_value` will contain the parsed value produced by this parse handler, while `pos` will have been moved to the end of the parsed content.
 		// The string parse handler is not supposed to modify any read/write/modify access accounting data.
-		typedef void (*ParamOnParseFunction)(RTP &target, T &new_value, const std::string &source_value_str, unsigned int &pos, ParamSetBySourceType source_type);
+		typedef void ParamOnParseCFunction(RTP &target, T &new_value, const std::string &source_value_str, unsigned int &pos, ParamSetBySourceType source_type);
 
 		// Return the formatted string value, depending on the formatting purpose. The format handler is not supposed to modify any read/write/modify access accounting data.
-		typedef std::string (*ParamOnFormatFunction)(const RTP &source, const T &value, const T& default_value, ValueFetchPurpose purpose);
+		typedef std::string ParamOnFormatCFunction(const RTP &source, const T &value, const T& default_value, ValueFetchPurpose purpose);
+
+		using ParamOnModifyFunction = std::function<ParamOnModifyCFunction>;
+		using ParamOnValidateFunction = std::function<ParamOnValidateCFunction>;
+		using ParamOnParseFunction = std::function<ParamOnParseCFunction>;
+		using ParamOnFormatFunction = std::function<ParamOnFormatCFunction>;
 
 	public:
 		RefTypedParam(const char *value, const Assistant &assist, THE_4_HANDLERS_PROTO);
@@ -730,18 +746,23 @@ namespace parameters {
 		using Param::operator=;
 
 		// Return true when modify action may proceed. `new_value` MAY have been adjusted by this modify handler. The modify handler is not supposed to modify any read/write/modify access accounting data.
-		typedef void (*ParamOnModifyFunction)(RTP &target, const VecT &old_value, VecT &new_value, const VecT &default_value, ParamSetBySourceType source_type, ParamPtr optional_setter);
+		typedef void ParamOnModifyCFunction(RTP &target, const VecT &old_value, VecT &new_value, const VecT &default_value, ParamSetBySourceType source_type, ParamPtr optional_setter);
 
 		// Return true when validation action passed and modify/write may proceed. `new_value` MAY have been adjusted by this validation handler. The validation handler is not supposed to modify any read/write/modify access accounting data.
-		typedef void (*ParamOnValidateFunction)(RTP &target, const VecT &old_value, VecT &new_value, const VecT &default_value, ParamSetBySourceType source_type);
+		typedef void ParamOnValidateCFunction(RTP &target, const VecT &old_value, VecT &new_value, const VecT &default_value, ParamSetBySourceType source_type);
 
 		// Return true when parse action succeeded (parsing `source_value_str` starting at offset `pos`).
 		// `new_value` will contain the parsed value produced by this parse handler, while `pos` will have been moved to the end of the parsed content.
 		// The string parse handler is not supposed to modify any read/write/modify access accounting data.
-		typedef void (*ParamOnParseFunction)(RTP &target, VecT &new_value, const std::string &source_value_str, unsigned int &pos, ParamSetBySourceType source_type);
+		typedef void ParamOnParseCFunction(RTP &target, VecT &new_value, const std::string &source_value_str, unsigned int &pos, ParamSetBySourceType source_type);
 
 		// Return the formatted string value, depending on the formatting purpose. The format handler is not supposed to modify any read/write/modify access accounting data.
-		typedef std::string (*ParamOnFormatFunction)(const RTP &source, const VecT &value, const VecT& default_value, ValueFetchPurpose purpose);
+		typedef std::string ParamOnFormatCFunction(const RTP &source, const VecT &value, const VecT& default_value, ValueFetchPurpose purpose);
+
+		using ParamOnModifyFunction = std::function<ParamOnModifyCFunction>;
+		using ParamOnValidateFunction = std::function<ParamOnValidateCFunction>;
+		using ParamOnParseFunction = std::function<ParamOnParseCFunction>;
+		using ParamOnFormatFunction = std::function<ParamOnFormatCFunction>;
 
 	public:
 		BasicVectorTypedParam(const char *value, const Assistant &assist, THE_4_HANDLERS_PROTO);
@@ -844,18 +865,23 @@ namespace parameters {
 		using Param::operator=;
 
 		// Return true when modify action may proceed. `new_value` MAY have been adjusted by this modify handler. The modify handler is not supposed to modify any read/write/modify access accounting data.
-		typedef void (*ParamOnModifyFunction)(RTP &target, const VecT &old_value, VecT &new_value, const VecT &default_value, ParamSetBySourceType source_type, ParamPtr optional_setter);
+		typedef void ParamOnModifyCFunction(RTP &target, const VecT &old_value, VecT &new_value, const VecT &default_value, ParamSetBySourceType source_type, ParamPtr optional_setter);
 
 		// Return true when validation action passed and modify/write may proceed. `new_value` MAY have been adjusted by this validation handler. The validation handler is not supposed to modify any read/write/modify access accounting data.
-		typedef void (*ParamOnValidateFunction)(RTP &target, const VecT &old_value, VecT &new_value, const VecT &default_value, ParamSetBySourceType source_type);
+		typedef void ParamOnValidateCFunction(RTP &target, const VecT &old_value, VecT &new_value, const VecT &default_value, ParamSetBySourceType source_type);
 
 		// Return true when parse action succeeded (parsing `source_value_str` starting at offset `pos`).
 		// `new_value` will contain the parsed value produced by this parse handler, while `pos` will have been moved to the end of the parsed content.
 		// The string parse handler is not supposed to modify any read/write/modify access accounting data.
-		typedef void (*ParamOnParseFunction)(RTP &target, VecT &new_value, const std::string &source_value_str, unsigned int &pos, ParamSetBySourceType source_type);
+		typedef void ParamOnParseCFunction(RTP &target, VecT &new_value, const std::string &source_value_str, unsigned int &pos, ParamSetBySourceType source_type);
 
 		// Return the formatted string value, depending on the formatting purpose. The format handler is not supposed to modify any read/write/modify access accounting data.
-		typedef std::string (*ParamOnFormatFunction)(const RTP &source, const VecT &value, const VecT& default_value, ValueFetchPurpose purpose);
+		typedef std::string ParamOnFormatCFunction(const RTP &source, const VecT &value, const VecT& default_value, ValueFetchPurpose purpose);
+
+		using ParamOnModifyFunction = std::function<ParamOnModifyCFunction>;
+		using ParamOnValidateFunction = std::function<ParamOnValidateCFunction>;
+		using ParamOnParseFunction = std::function<ParamOnParseCFunction>;
+		using ParamOnFormatFunction = std::function<ParamOnFormatCFunction>;
 
 	public:
 		ObjectVectorTypedParam(const char *value, const Assistant &assist, THE_4_HANDLERS_PROTO);
