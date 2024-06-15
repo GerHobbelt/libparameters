@@ -37,12 +37,14 @@ namespace parameters {
 		// followed by the Value, which spans the rest of line.
 		static bool ReadParamsFile(const std::string &file, // filename to read
 															 const ParamsVectorSet &set,
+															 SurplusParamsVector *surplus,
 															 SOURCE_REF);
 
 		// Read parameters from the given file pointer.
 		// Otherwise identical to ReadParamsFile().
-		static bool ReadParamsFromFp(ConfigFile &fp,
+		static bool ReadParamsFile(ConfigFile &fp,
 																 const ParamsVectorSet &set,
+															 SurplusParamsVector *surplus,
 																 SOURCE_REF);
 
 		/**

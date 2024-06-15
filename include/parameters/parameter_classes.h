@@ -365,6 +365,7 @@ namespace parameters {
 		// particular parameter, then its value is reset to the default value which was
 		// specified earlier in its constructor.
 		virtual void ResetToDefault(const ParamsVectorSet *source_vec = 0, SOURCE_TYPE) = 0;
+		void ResetToDefault(const ParamsVectorSet &source_vec, SOURCE_TYPE);
 
 		Param(const Param &o) = delete;
 		Param(Param &&o) = delete;
@@ -466,6 +467,7 @@ namespace parameters {
 		// particular parameter, then its value is reset to the default value which was
 		// specified earlier in its constructor.
 		virtual void ResetToDefault(const ParamsVectorSet *source_vec = 0, SOURCE_TYPE) override;
+		using Param::ResetToDefault;
 
 		virtual std::string value_str(ValueFetchPurpose purpose) const override;
 
@@ -583,6 +585,7 @@ namespace parameters {
 		// particular parameter, then its value is reset to the default value which was
 		// specified earlier in its constructor.
 		virtual void ResetToDefault(const ParamsVectorSet *source_vec = 0, SOURCE_TYPE) override;
+		using Param::ResetToDefault;
 
 		virtual std::string value_str(ValueFetchPurpose purpose) const override;
 
@@ -702,6 +705,7 @@ namespace parameters {
 		// particular parameter, then its value is reset to the default value which was
 		// specified earlier in its constructor.
 		virtual void ResetToDefault(const ParamsVectorSet *source_vec = 0, SOURCE_TYPE) override;
+		using Param::ResetToDefault;
 
 		virtual std::string value_str(ValueFetchPurpose purpose) const override;
 
@@ -820,6 +824,7 @@ namespace parameters {
 		// particular parameter, then its value is reset to the default value which was
 		// specified earlier in its constructor.
 		virtual void ResetToDefault(const ParamsVectorSet *source_vec = 0, SOURCE_TYPE) override;
+		using Param::ResetToDefault;
 
 		virtual std::string value_str(ValueFetchPurpose purpose) const override;
 
@@ -940,6 +945,7 @@ namespace parameters {
 		// particular parameter, then its value is reset to the default value which was
 		// specified earlier in its constructor.
 		virtual void ResetToDefault(const ParamsVectorSet *source_vec = 0, SOURCE_TYPE) override;
+		using Param::ResetToDefault;
 
 		virtual std::string value_str(ValueFetchPurpose purpose) const override;
 

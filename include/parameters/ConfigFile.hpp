@@ -11,6 +11,8 @@
 #ifndef _LIB_PARAMS_CONFIGFILE_H_
 #define _LIB_PARAMS_CONFIGFILE_H_
 
+#include <parameters/CString.hpp>
+
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -35,6 +37,8 @@ namespace parameters {
 		operator bool() const {
 			return _f != nullptr;
 		};
+
+		bool ReadLine(CString<4096> &line);
 
 	private:
 		FILE *_f;

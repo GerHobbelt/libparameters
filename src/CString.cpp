@@ -8,3 +8,8 @@
 
 #include <parameters/CString.hpp>
 
+#include "internal_helpers.hpp"
+
+namespace parameters {
+
+}

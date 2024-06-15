@@ -121,6 +121,61 @@ namespace parameters {
 
 	// --------------------------------------------------------------------------------------------------
 
+// A set (vector) of surplus parameters, i.e. parameters which are defined at run-time, rather than at compile-time.
+// This SurplusParamsVector class is the owner of each of these (heap allocated) parameters, which are created on demand
+// when calling the add() method.
+	class SurplusParamsVector {
+	public:
+		SurplusParamsVector() = delete;
+		SurplusParamsVector(const char* title);
+		//SurplusParamsVector(const char *title, std::initializer_list<ParamPtr> vecs);
+
+		~SurplusParamsVector();
+
+#define THE_4_HANDLERS_PROTO(type)                                                                    \
+		type::ParamOnModifyFunction on_modify_f = 0, type::ParamOnValidateFunction on_validate_f = 0,			\
+			type::ParamOnParseFunction on_parse_f = 0, type::ParamOnFormatFunction on_format_f = 0
+
+		void add(const int32_t value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(IntParam));
+		void add(const bool value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(BoolParam));
+		void add(const double value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(DoubleParam));
+		void add(const std::string &value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(StringParam));
+		void add(const std::vector<int32_t> value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(IntSetParam));
+		void add(const std::vector<bool> value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(BoolSetParam));
+		void add(const std::vector<double> value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(DoubleSetParam));
+		void add(const std::vector<std::string> &value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(StringSetParam));
+
+		void add(const char *value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(StringParam));
+
+#undef THE_4_HANDLERS_PROTO
+
+		void add(ParamPtr param_ref);
+		void add(std::initializer_list<ParamPtr> vecs);
+
+		void remove(ParamPtr param_ref);
+	
+		const char* title() const;
+		void change_title(const char* title);
+
+		ParamPtr find(
+			const char *name,
+			ParamType accepted_types_mask
+		) const;
+
+		template <ParamDerivativeType T>
+		T *find(
+			const char *name
+		) const;
+
+		std::vector<ParamPtr> as_list(
+			ParamType accepted_types_mask = ANY_TYPE_PARAM
+		) const;
+
+		friend class ParamsVectorSet;
+	};
+
+	// --------------------------------------------------------------------------------------------------
+
 	// an (ad-hoc?) collection of ParamsVector instances.
 	class ParamsVectorSet final {
 	private:

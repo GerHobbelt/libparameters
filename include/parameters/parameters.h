@@ -13,5 +13,6 @@
 #include <parameters/ConfigFile.hpp>
 #include <parameters/ReportFile.hpp>
 #include <parameters/HelperMacros.hpp>
+#include <parameters/CString.hpp>
 
 #endif
