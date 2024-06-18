@@ -3,6 +3,8 @@
 
 #include "internal_helpers.hpp"
 
+#include <ghc/fs_std.hpp>  // namespace fs = std::filesystem;   or   namespace fs = ghc::filesystem;
+
 
 namespace parameters {
 
@@ -24,9 +26,12 @@ namespace parameters {
 		if (strieq(path, "/dev/stdin") || strieq(path, "stdin") || strieq(path, "-") || strieq(path, "1"))
 			_f = stdin;
 		else {
-			_f = fopenUtf8(path, "r");
+			fs::path p = fs::weakly_canonical(path);
+			std::u8string p8 = p.u8string();
+			std::string ps = reinterpret_cast<const char *>(p8.c_str());
+			_f = fopen(ps.c_str(), "r");
 			if (!_f) {
-				tprintError("Cannot open file: '{}'\n", path);
+				tprintError("Cannot open file for reading its content: {}\n", ps);
 			}
 		}
 	}

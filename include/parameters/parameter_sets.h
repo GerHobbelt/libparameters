@@ -124,7 +124,7 @@ namespace parameters {
 // A set (vector) of surplus parameters, i.e. parameters which are defined at run-time, rather than at compile-time.
 // This SurplusParamsVector class is the owner of each of these (heap allocated) parameters, which are created on demand
 // when calling the add() method.
-	class SurplusParamsVector {
+	class SurplusParamsVector : public ParamsVector {
 	public:
 		SurplusParamsVector() = delete;
 		SurplusParamsVector(const char* title);
@@ -153,23 +153,6 @@ namespace parameters {
 		void add(std::initializer_list<ParamPtr> vecs);
 
 		void remove(ParamPtr param_ref);
-	
-		const char* title() const;
-		void change_title(const char* title);
-
-		ParamPtr find(
-			const char *name,
-			ParamType accepted_types_mask
-		) const;
-
-		template <ParamDerivativeType T>
-		T *find(
-			const char *name
-		) const;
-
-		std::vector<ParamPtr> as_list(
-			ParamType accepted_types_mask = ANY_TYPE_PARAM
-		) const;
 
 		friend class ParamsVectorSet;
 	};
@@ -190,6 +173,10 @@ namespace parameters {
 		void add(ParamsVector &vec_ref);
 		void add(ParamsVector *vec_ref);
 		void add(std::initializer_list<ParamsVector *> vecs);
+		void add(const ParamsVectorSet &vecset_ref);
+		void add(const ParamsVectorSet *vecset_ref);
+
+		const std::vector<ParamsVector *> &get() const;
 
 		ParamPtr find(
 			const char *name,

@@ -439,6 +439,23 @@ namespace parameters {
 		}
 	}
 
+	void ParamsVectorSet::add(const ParamsVectorSet &vecset_ref) {
+		for (ParamsVector *i : vecset_ref.collection_) {
+			add(i);
+		}
+	}
+	void ParamsVectorSet::add(const ParamsVectorSet *vecset_ref) {
+		if (vecset_ref == nullptr)
+			return;
+		for (ParamsVector *i : vecset_ref->collection_) {
+			add(i);
+		}
+	}
+
+	const std::vector<ParamsVector *> &ParamsVectorSet::get() const {
+		return collection_;
+	}
+
 	Param *ParamsVectorSet::find(
 		const char *name,
 		ParamType accepted_types_mask

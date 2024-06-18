@@ -24,6 +24,30 @@ namespace parameters {
 
 	// --------------------------------------------------------------------------------------------------
 
+	// ParamsReportWriter, et al, used as support classes for the paramaeter usage reporting APIs ReportParamsUsageStatistics() et al.
+
+	// The idea of the ParamsReportWriter class hierarchy is this:
+	// 
+	// We can output to one or more targets, each of arbitrary type, e.g. stdout (logging), config file, logfile.
+	// 
+	// The parameter info text is also printed, before the parameter value, and should be treated as comment.
+	// When printing to stdout info text is included; the reportwriter must buffer and re-order the name + info=comment + value as desired..
+	// Info text is omitted when printing to a basic config file.
+
+	class ParamsReportWriter {
+	public:
+		ParamsReportWriter() {}
+		virtual ~ParamsReportWriter() = default;
+
+		virtual void WriteParamInfo(const Param &param) = 0;
+		virtual void WriteParamValue(const Param &param) = 0;
+		virtual void WriteReportHeaderLine(const std::string &message) = 0;
+		virtual void WriteReportInfoLine(const std::string &message) = 0;
+		virtual void WriteInfoLine(const std::string &message) = 0;
+	};
+
+	// --------------------------------------------------------------------------------------------------
+
 	// Utility functions for working with Tesseract parameters.
 	class ParamUtils {
 	public:
@@ -128,49 +152,10 @@ namespace parameters {
 				const ParamsVector &set,
 				ParamType accepted_types_mask = ANY_TYPE_PARAM);
 
-#if 0
-		// Fetches the value of the named param as a string and does not add
-		// this access to the read counter tally. This is useful, f.e., when printing 'init'
-		// (only-settable-before-first-use) parameters to config file or log file, independent
-		// from the actual work process.
-		// Returns false if not found. Prints a message via `tprintf()` to report this fact
-		// (see also `FindParam()`).
-		//
-		// When `set` is empty, the `GlobalParams()` vector will be assumed instead.
-		static bool InspectParamAsString(
-				std::string *value_ref, const char *name,
-				const ParamsVectorSet &set,
-				ParamType accepted_types_mask = ANY_TYPE_PARAM);
+		// --------------------------------------------------------------------------------------------------
 
-		// Fetches the value of the named param as a string and does not add
-		// this access to the read counter tally. This is useful, f.e., when printing 'init'
-		// (only-settable-before-first-use) parameters to config file or log file, independent
-		// from the actual work process.
-		// Returns false if not found. Prints a message via `tprintf()` to report this fact
-		// (see also `FindParam()`).
-		//
-		// When `set` is empty, the `GlobalParams()` vector will be assumed instead.
-		static bool InspectParamAsString(
-				std::string *value_ref, const char *name,
-				const ParamsVector &set,
-				ParamType accepted_types_mask = ANY_TYPE_PARAM);
-
-		// Fetches the value of the named param as a ParamValueContainer and does not add
-		// this access to the read counter tally. This is useful, f.e., when editing 'init'
-		// (only-settable-before-first-use) parameters in a UI before starting the actual
-		// process.
-		// Returns false if not found. Prints a message via `tprintf()` to report this
-		// fact (see also `FindParam()`).
-		//
-		// When `set` is empty, the `GlobalParams()` vector will be assumed instead.
-		static bool InspectParam(
-				std::string &value_dst, const char *name,
-				const ParamsVectorSet &set,
-				ParamType accepted_types_mask = ANY_TYPE_PARAM);
-#endif
-
-		// Print all parameters in the given set(s) to the given file.
-		static void PrintParams(FILE *fp, const ParamsVectorSet &set, bool print_info = true);
+		// Print all parameters in the given set(s) to the given output.
+		static void PrintParams(ParamsReportWriter &dst, const ParamsVectorSet &set, const char *section_title = nullptr);
 
 		// Report parameters' usage statistics, i.e. report which params have been
 		// set, modified and read/checked until now during this run-time's lifetime.
@@ -180,8 +165,8 @@ namespace parameters {
 		// answering the question:
 		// "Which of all those parameters are actually *relevant* to my use case today?"
 		//
-		// When `section_title` is NULL, this will report the lump sum parameter usage
-		// for the entire run. When `section_title` is NOT NULL, this will only report
+		// When `is_section_subreport` is FALSE, this will report the lump sum parameter usage
+		// for the entire run. When `is_section_subreport` is TRUE, this will only report
 		// the parameters that were actually used (R/W) during the last section of the
 		// run, i.e. since the previous invocation of this reporting method (or when
 		// it hasn't been called before: the start of the application).
@@ -191,7 +176,9 @@ namespace parameters {
 		// which may be stdout/stderr.
 		//
 		// When `set` is empty, the `GlobalParams()` vector will be assumed instead.
-		static void ReportParamsUsageStatistics(FILE *fp, const ParamsVectorSet &set, const char *section_title = nullptr);
+		static void ReportParamsUsageStatistics(ParamsReportWriter &dst, const ParamsVectorSet &set, bool is_section_subreport, bool report_unused_params, const char *section_title = nullptr);
+
+		// --------------------------------------------------------------------------------------------------
 
 		// Resets all parameters back to default values;
 		static void ResetToDefaults(const ParamsVectorSet &set, SOURCE_TYPE);

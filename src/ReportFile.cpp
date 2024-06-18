@@ -3,6 +3,8 @@
 
 #include "internal_helpers.hpp"
 
+#include <ghc/fs_std.hpp>  // namespace fs = std::filesystem;   or   namespace fs = ghc::filesystem;
+
 
 namespace parameters {
 
@@ -37,9 +39,13 @@ namespace parameters {
 					break;
 				}
 			}
-			_f = fopenUtf8(path, first ? "w" : "a");
+			const char *mode = (first ? "w" : "a");
+			fs::path p = fs::weakly_canonical(path);
+			std::u8string p8 = p.u8string();
+			std::string ps = reinterpret_cast<const char *>(p8.c_str());
+			_f = fopen(ps.c_str(), mode);
 			if (!_f) {
-				tprintError("Cannot produce parameter usage report file: '{}'\n", path);
+				tprintError("Cannot produce report/output file: {}\n", ps);
 			} else if (first) {
 				_processed_file_paths.push_back(path);
 			}
