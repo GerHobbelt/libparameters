@@ -9,9 +9,9 @@
 
 #include <parameters/parameter_classes.h>
 #include <parameters/parameter_sets.h>
-#include <parameters/Utilities.hpp>
-#include <parameters/ConfigFile.hpp>
-#include <parameters/ReportFile.hpp>
+#include <parameters/utilities.h>
+#include <parameters/configreader.h>
+#include <parameters/reportwriter.h>
 #include <parameters/HelperMacros.hpp>
 #include <parameters/CString.hpp>
 

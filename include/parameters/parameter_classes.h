@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <parameters/fmt-support.h>
 
 
 namespace parameters {
@@ -37,6 +38,11 @@ namespace parameters {
 
 		ANY_TYPE_PARAM =    0x03FF, // catch-all identifier for the selection/filter functions: there this is used to match *any and all* parameter value types encountered.
 	};
+DECL_FMT_FORMAT_PARAMENUMTYPE(ParamType);
+
+static inline auto format_as(ParamType t) {
+  return fmt::underlying(t);
+}
 
 	// Identifiers used to indicate the *origin* of the current parameter value. Used for reporting/diagnostic purposes. Do not treat these
 	// as gospel; these are often assigned under limited/reduced information conditions, so they merely serve as report *hints*.
@@ -44,13 +50,18 @@ namespace parameters {
 		PARAM_VALUE_IS_DEFAULT = 0,
 
 		PARAM_VALUE_IS_RESET,
+		PARAM_VALUE_IS_SET_BY_PRESET,         // 'indirect' write: a tesseract 'preset' parameter set was invoked and that one set this one as part of the action.
+		PARAM_VALUE_IS_SET_BY_CONFIGFILE,     // 'explicit' write by loading and processing a config file.
 		PARAM_VALUE_IS_SET_BY_ASSIGN,			    // 'indirect' write: value is copied over from elsewhere via operator=.
 		PARAM_VALUE_IS_SET_BY_PARAM,          // 'indirect' write: other Param's OnChange code set the param value, whatever it is now.
-		PARAM_VALUE_IS_SET_BY_PRESET,         // 'indirect' write: a tesseract 'preset' parameter set was invoked and that one set this one as part of the action.
-		PARAM_VALUE_IS_SET_BY_CORE_RUN,       // 'explicit' write by the running tesseract core: before proceding with the next step the run-time adjusts this one, e.g. (incrementing) page number while processing a multi-page OCR run.
-		PARAM_VALUE_IS_SET_BY_CONFIGFILE,     // 'explicit' write by loading and processing a config file.
 		PARAM_VALUE_IS_SET_BY_APPLICATION,    // 'explicit' write: user / application code set the param value, whatever it is now.
+		PARAM_VALUE_IS_SET_BY_CORE_RUN,       // 'explicit' write by the running application core: before proceding with the next step the run-time adjusts this one, e.g. (incrementing) page number while processing a multi-page OCR run.
 	};
+DECL_FMT_FORMAT_PARAMENUMTYPE(ParamSetBySourceType);
+
+static inline auto format_as(ParamSetBySourceType t) {
+  return fmt::underlying(t);
+}
 
 	// --------------------------------------------------------------------------------------------------
 
@@ -195,6 +206,8 @@ namespace parameters {
 
 		void lock(bool locking = true);
 
+		bool can_update(ParamSetBySourceType source_type) const noexcept;
+
 		// Signal a (recoverable) fault; used, together with has_faulted() and reset_fault(), by the parameter classes' internals when,
 		// f.e., a string value doesn't parse or fails to pass a parameter's validation checks.
 		//
@@ -293,10 +306,17 @@ namespace parameters {
 
 			// Return string representing the type of the parameter value, e.g. "integer"
 			//
+			// We do not count this read access as this method is for *print/write-to-file* purposes only and we do not
+			// wish to tally those together with the actual work code accessing this parameter through
+			// the other functions: set_value() and assignment operators.
+			VALSTR_PURPOSE_TYPE_INFO_4_INSPECT,
+
+			// Return string representing the type of the parameter value, e.g. "integer"
+			//
 			// We do not count this read access as this method is for *display* purposes only and we do not
 			// wish to tally those together with the actual work code accessing this parameter through
 			// the other functions: set_value() and assignment operators.
-			VALSTR_PURPOSE_TYPE_INFO,
+			VALSTR_PURPOSE_TYPE_INFO_4_DISPLAY,
 		};
 
 		// Fetches the (possibly formatted) value of the param as a string; see the ValueFetchPurpose
@@ -350,6 +370,13 @@ namespace parameters {
 		// wish to tally those together with the actual work code accessing this parameter through
 		// the other functions: set_value() and assignment operators.
 		std::string value_type_str() const;
+
+		// Return string representing the type of the parameter value, e.g. "integer"
+		//
+		// We do not count this read access as this method is for *print/save-to-file* purposes only and we do not
+		// wish to tally those together with the actual work code accessing this parameter through
+		// the other functions: set_value() and assignment operators.
+		std::string raw_value_type_str() const;
 
 		virtual void set_value(const char *v, SOURCE_REF) = 0;
 

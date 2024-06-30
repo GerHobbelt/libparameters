@@ -1,8 +1,8 @@
 
 #include <parameters/parameters.h>
 #include <parameters/CString.hpp>
-#include <parameters/ConfigFile.hpp>
-#include <parameters/ReportFile.hpp>
+#include <parameters/configreader.h>
+#include <parameters/reportwriter.h>
 
 #include "internal_helpers.hpp"
 
@@ -640,8 +640,12 @@ namespace parameters {
 		return value_str(VALSTR_PURPOSE_RAW_DEFAULT_DATA_4_INSPECT);
 	}
 
+	std::string Param::raw_value_type_str() const {
+		return value_str(VALSTR_PURPOSE_TYPE_INFO_4_INSPECT);
+	}
+
 	std::string Param::value_type_str() const {
-		return value_str(VALSTR_PURPOSE_TYPE_INFO);
+		return value_str(VALSTR_PURPOSE_TYPE_INFO_4_DISPLAY);
 	}
 
 	void Param::set_value(const std::string &v, ParamSetBySourceType source_type, ParamPtr source) {
@@ -678,7 +682,24 @@ namespace parameters {
 	}
 #endif
 
+	bool Param::can_update(ParamSetBySourceType source_type) const noexcept {
+		switch (set_mode()) {
+		case PARAM_VALUE_IS_DEFAULT:
+		case PARAM_VALUE_IS_RESET:
+			//
+		case PARAM_VALUE_IS_SET_BY_APPLICATION:
+		case PARAM_VALUE_IS_SET_BY_CORE_RUN:
+			// apply always
+			return true;;
 
+		default:
+			if (set_mode() < source_type)
+				return true;
+
+			// silently ignore this write attempt? :: order of precedence override.
+			return false;
+		}
+	}
 
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -746,7 +767,7 @@ namespace parameters {
 			} else {
 				errmsg = "the parser was unable to parse anything at all";
 			}
-			tprintError("ERROR: error parsing {} parameter '{}' value (\"{}\") to {}; {}. The parameter value will not be adjusted: the preset value ({}) will be used instead.\n", ParamUtils::GetApplicationName(), target.name_str(), source_value_str, target.value_type_str(), errmsg, target.formatted_value_str());
+			PARAM_ERROR("ERROR: error parsing {} parameter '{}' value (\"{}\") to {}; {}. The parameter value will not be adjusted: the preset value ({}) will be used instead.\n", ParamUtils::GetApplicationName(), target.name_str(), source_value_str, target.value_type_str(), errmsg, target.formatted_value_str());
 
 			// This value parse handler thus decides to NOT have a value written; we therefore signal a fault state right now: these are (non-fatal) non-silent errors.
 			//
@@ -792,7 +813,10 @@ namespace parameters {
 			return std::to_string(default_value);
 
 			// Return string representing the type of the parameter value, e.g. "integer".
-		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO:
+		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO_4_INSPECT:
+			return "int32_t";
+
+		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO_4_DISPLAY:
 			return "integer";
 
 		default:
@@ -835,12 +859,19 @@ namespace parameters {
 
 	template<>
 	void IntParam::set_value(int32_t value, ParamSetBySourceType source_type, ParamPtr source) {
+		reset_fault();
+
+		if (!can_update(source_type)) {
+			PARAM_TRACE("Silently ignoring parameter {} write due to precedence: current level: {} vs. write attempt level: {} (present value: {}, skipped: {})\n",
+				name_str(), set_mode(), source_type, formatted_value_str(), value);
+			return;
+		}
+
 		safe_inc(access_counts_.writing);
 		// ^^^^^^^ --
 		// Our 'writing' statistic counts write ATTEMPTS, in reailty.
 		// Any real change is tracked by the 'changing' statistic (see further below)!
 
-		reset_fault();
 		// when we fail the validation horribly, the validator will throw an exception and thus abort the (write) action.
 		// non-fatal errors may be signaled, in which case the write operation is aborted/skipped, or not signaled (a.k.a. 'silent')
 		// in which case the write operation proceeds as if nothing untoward happened inside on_validate_f.
@@ -848,15 +879,19 @@ namespace parameters {
 		if (!has_faulted()) {
 			// however, when we failed the validation only in the sense of the value being adjusted/restricted by the validator,
 			// then we must set the value as set by the validator anyway, so nothing changes in our workflow here.
-
-			set_ = (source_type > PARAM_VALUE_IS_RESET);
-			set_to_non_default_value_ = (value != default_);
-
 			if (value != value_) {
 				on_modify_f_(*this, value_, value, default_, source_type, source);
-				if (!has_faulted() && value != value_) {
-					safe_inc(access_counts_.changing);
-					value_ = value;
+				if (!has_faulted()) {
+					if (value != value_) {
+						safe_inc(access_counts_.changing);
+						value_ = value;
+
+						set_to_non_default_value_ = (value != default_);
+					}
+
+					set_mode_ = source_type;
+					setter_ = source;
+					set_ = (source_type > PARAM_VALUE_IS_RESET);
 				}
 			}
 		}
@@ -1071,7 +1106,7 @@ namespace parameters {
 			} else {
 				errmsg = "the parser was unable to parse anything at all";
 			}
-			tprintError("ERROR: error parsing {} parameter '{}' value (\"{}\") to {}; {}. The parameter value will not be adjusted: the preset value ({}) will be used instead.\n", ParamUtils::GetApplicationName(), target.name_str(), source_value_str, target.value_type_str(), errmsg, target.formatted_value_str());
+			PARAM_ERROR("ERROR: error parsing {} parameter '{}' value (\"{}\") to {}; {}. The parameter value will not be adjusted: the preset value ({}) will be used instead.\n", ParamUtils::GetApplicationName(), target.name_str(), source_value_str, target.value_type_str(), errmsg, target.formatted_value_str());
 
 			// This value parse handler thus decides to NOT have a value written; we therefore signal a fault state right now: these are (non-fatal) non-silent errors.
 			//
@@ -1115,7 +1150,10 @@ namespace parameters {
 			return default_value ? "true" : "false";
 
 			// Return string representing the type of the parameter value, e.g. "integer".
-		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO:
+		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO_4_INSPECT:
+			return "bool";
+
+		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO_4_DISPLAY:
 			return "boolean";
 
 		default:
@@ -1357,7 +1395,7 @@ namespace parameters {
 			} else {
 				errmsg = "the parser was unable to parse anything at all";
 			}
-			tprintError("ERROR: error parsing {} parameter '{}' value (\"{}\") to {}; {}. The parameter value will not be adjusted: the preset value ({}) will be used instead.\n", ParamUtils::GetApplicationName(), target.name_str(), source_value_str, target.value_type_str(), errmsg, target.formatted_value_str());
+			PARAM_ERROR("ERROR: error parsing {} parameter '{}' value (\"{}\") to {}; {}. The parameter value will not be adjusted: the preset value ({}) will be used instead.\n", ParamUtils::GetApplicationName(), target.name_str(), source_value_str, target.value_type_str(), errmsg, target.formatted_value_str());
 
 			// This value parse handler thus decides to NOT have a value written; we therefore signal a fault state right now: these are (non-fatal) non-silent errors.
 			//
@@ -1417,7 +1455,10 @@ namespace parameters {
 #endif
 
 			// Return string representing the type of the parameter value, e.g. "integer".
-		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO:
+		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO_4_INSPECT:
+			return "float";
+
+		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO_4_DISPLAY:
 			return "floating point";
 
 		default:
@@ -1600,7 +1641,8 @@ namespace parameters {
 			return default_value;
 
 			// Return string representing the type of the parameter value, e.g. "integer".
-		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO:
+		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO_4_INSPECT:
+		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO_4_DISPLAY:
 			return "string";
 
 		default:
@@ -1962,7 +2004,10 @@ namespace parameters {
 			return fmt_stringset_vector(default_value, assistant.fmt_display_prefix.c_str(), assistant.fmt_display_postfix.c_str(), assistant.fmt_display_separator.c_str());
 
 			// Return string representing the type of the parameter value, e.g. "integer".
-		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO:
+		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO_4_INSPECT:
+			return "StringArray";
+
+		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO_4_DISPLAY:
 			return "set of strings";
 
 		default:
@@ -2315,7 +2360,7 @@ namespace parameters {
 					} else {
 						errmsg = fmt::format("the parser was unable to parse anything at all at item #{} (\"{}\")", new_value.size(), tailstr);
 					}
-					tprintError("ERROR: error parsing {} parameter '{}' value (\"{}\") to {}; {}. The parameter value will not be adjusted: the preset value ({}) will be used instead.\n", ParamUtils::GetApplicationName(), target.name_str(), source_value_str, target.value_type_str(), errmsg, target.formatted_value_str());
+					PARAM_ERROR("ERROR: error parsing {} parameter '{}' value (\"{}\") to {}; {}. The parameter value will not be adjusted: the preset value ({}) will be used instead.\n", ParamUtils::GetApplicationName(), target.name_str(), source_value_str, target.value_type_str(), errmsg, target.formatted_value_str());
 
 					return; // Note: vs_dropper will take care of our heap-allocated scratch buffer for us.
 				}
@@ -2370,7 +2415,10 @@ namespace parameters {
 			return fmt_stringset_vector(default_value, assistant.fmt_display_prefix.c_str(), assistant.fmt_display_postfix.c_str(), assistant.fmt_display_separator.c_str());
 
 			// Return string representing the type of the parameter value, e.g. "integer".
-		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO:
+		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO_4_INSPECT:
+			return "Int32Array";
+
+		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO_4_DISPLAY:
 			return "set of integers";
 
 		default:

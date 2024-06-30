@@ -9,42 +9,19 @@
 
 #include <parameters/parameters.h>
 #include <parameters/parameter_sets.h>
+#include <parameters/reportwriter.h>
+#include <parameters/configreader.h>
 
 #include <cstdint>
 #include <string>
-#include <vector>
 
 
 namespace parameters {
 
-	class ConfigFile;
-	class ReportFile;
-
 #include <parameters/sourceref_defstart.h>
 
-	// --------------------------------------------------------------------------------------------------
-
-	// ParamsReportWriter, et al, used as support classes for the paramaeter usage reporting APIs ReportParamsUsageStatistics() et al.
-
-	// The idea of the ParamsReportWriter class hierarchy is this:
-	// 
-	// We can output to one or more targets, each of arbitrary type, e.g. stdout (logging), config file, logfile.
-	// 
-	// The parameter info text is also printed, before the parameter value, and should be treated as comment.
-	// When printing to stdout info text is included; the reportwriter must buffer and re-order the name + info=comment + value as desired..
-	// Info text is omitted when printing to a basic config file.
-
-	class ParamsReportWriter {
-	public:
-		ParamsReportWriter() {}
-		virtual ~ParamsReportWriter() = default;
-
-		virtual void WriteParamInfo(const Param &param) = 0;
-		virtual void WriteParamValue(const Param &param) = 0;
-		virtual void WriteReportHeaderLine(const std::string &message) = 0;
-		virtual void WriteReportInfoLine(const std::string &message) = 0;
-		virtual void WriteInfoLine(const std::string &message) = 0;
-	};
+	class ConfigReader;
+	class ReportWriter;
 
 	// --------------------------------------------------------------------------------------------------
 
@@ -59,14 +36,7 @@ namespace parameters {
 		//
 		// Variable names are followed by one of more whitespace characters,
 		// followed by the Value, which spans the rest of line.
-		static bool ReadParamsFile(const std::string &file, // filename to read
-															 const ParamsVectorSet &set,
-															 SurplusParamsVector *surplus,
-															 SOURCE_REF);
-
-		// Read parameters from the given file pointer.
-		// Otherwise identical to ReadParamsFile().
-		static bool ReadParamsFile(ConfigFile &fp,
+		static bool ReadParamsFile(ConfigReader &fp,
 																 const ParamsVectorSet &set,
 															 SurplusParamsVector *surplus,
 																 SOURCE_REF);
@@ -155,7 +125,7 @@ namespace parameters {
 		// --------------------------------------------------------------------------------------------------
 
 		// Print all parameters in the given set(s) to the given output.
-		static void PrintParams(ParamsReportWriter &dst, const ParamsVectorSet &set, const char *section_title = nullptr);
+		static void PrintParams(ReportWriter &dst, const ParamsVectorSet &set, bool print_explanatory_comments = true, const char *section_title = nullptr);
 
 		// Report parameters' usage statistics, i.e. report which params have been
 		// set, modified and read/checked until now during this run-time's lifetime.
@@ -176,7 +146,7 @@ namespace parameters {
 		// which may be stdout/stderr.
 		//
 		// When `set` is empty, the `GlobalParams()` vector will be assumed instead.
-		static void ReportParamsUsageStatistics(ParamsReportWriter &dst, const ParamsVectorSet &set, bool is_section_subreport, bool report_unused_params, const char *section_title = nullptr);
+		static void ReportParamsUsageStatistics(ReportWriter &dst, const ParamsVectorSet &set, bool report_unused_params = false, const char *section_title = nullptr);
 
 		// --------------------------------------------------------------------------------------------------
 

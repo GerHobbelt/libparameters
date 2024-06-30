@@ -27,6 +27,7 @@
 
 #define DOUBLE_VAR_H(name) ::parameters::DoubleParam name
 
+
 #define INT_VAR(name, val, comment) \
   ::parameters::IntParam name(val, #name, comment, ::parameters::GlobalParams())
 
@@ -39,6 +40,18 @@
 #define DOUBLE_VAR(name, val, comment) \
   ::parameters::DoubleParam name(val, #name, comment, ::parameters::GlobalParams())
 
+#define vINT_VAR(name, val, comment, ...) \
+  ::parameters::IntParam name(val, #name, comment, ::parameters::GlobalParams(), __VA_ARGS__)
+
+#define vBOOL_VAR(name, val, comment, ...) \
+  ::parameters::BoolParam name(val, #name, comment, ::parameters::GlobalParams(), __VA_ARGS__)
+
+#define vSTRING_VAR(name, val, comment, ...) \
+  ::parameters::StringParam name(val, #name, comment, ::parameters::GlobalParams(), __VA_ARGS__)
+
+#define vDOUBLE_VAR(name, val, comment, ...) \
+  ::parameters::DoubleParam name(val, #name, comment, ::parameters::GlobalParams(), __VA_ARGS__)
+
 #define INT_MEMBER(name, val, comment, vec) name(val, #name, comment, vec)
 
 #define BOOL_MEMBER(name, val, comment, vec) name(val, #name, comment, vec)
@@ -47,12 +60,13 @@
 
 #define DOUBLE_MEMBER(name, val, comment, vec) name(val, #name, comment, vec)
 
-#define INT_INIT_MEMBER(name, val, comment, vec) name(val, #name, comment, vec)
+#define vINT_MEMBER(name, val, comment, vec, ...) name(val, #name, comment, vec, __VA_ARGS__)
 
-#define BOOL_INIT_MEMBER(name, val, comment, vec) name(val, #name, comment, vec)
+#define vBOOL_MEMBER(name, val, comment, vec, ...) name(val, #name, comment, vec, __VA_ARGS__)
 
-#define STRING_INIT_MEMBER(name, val, comment, vec) name(val, #name, comment, vec)
+#define vSTRING_MEMBER(name, val, comment, vec, ...) name(val, #name, comment, vec, __VA_ARGS__)
 
-#define DOUBLE_INIT_MEMBER(name, val, comment, vec) name(val, #name, comment, vec)
+#define vDOUBLE_MEMBER(name, val, comment, vec, ...) name(val, #name, comment, vec, __VA_ARGS__)
+
 
 #endif

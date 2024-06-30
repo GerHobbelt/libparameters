@@ -1,5 +1,7 @@
 
 #include <parameters/parameters.h>
+#include <parameters/utilities.h>
+#include <parameters/configreader.h>
 
 #include "internal_helpers.hpp"
 
@@ -64,59 +66,49 @@ namespace parameters {
 	//
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	bool ParamUtils::ReadParamsFile(const std::string &file,
-																	const ParamsVectorSet &member_params,
-															 SurplusParamsVector *surplus,
-																	ParamSetBySourceType source_type,
-																	ParamPtr source
-	) {
-		ConfigFile fp(file);
-		if (!fp()) {
-			tprintError("read_params_file: Can't open/read file {}\n", file);
-			return true;
-		}
-		return ReadParamsFile(fp, member_params, surplus, source_type, source);
-	}
-
-	bool ParamUtils::ReadParamsFile(ConfigFile &fp,
+	bool ParamUtils::ReadParamsFile(ConfigReader &fp,
 																		const ParamsVectorSet &member_params,
 															 SurplusParamsVector *surplus,
 																		ParamSetBySourceType source_type,
 																		ParamPtr source) {
-		CString<4096> line; // input line
+		ConfigReader::line  line; // input line
 		bool anyerr = false;  // true if any error
 		bool foundit;         // found parameter
 		char *nameptr;        // name field
 		char *valptr;         // value field
-		unsigned linecounter = 0;
 
-		while (fp.ReadLine(line)) {
-			linecounter++;
+		while (fp.ReadInfoLine(line)) {
+			nameptr = line.content.data();
 
-			line.Trim();
-			nameptr = line.data();
+			// jump over variable name
+			for (valptr = nameptr; *valptr && !std::isspace(*valptr); valptr++) {
+				;
+			}
 
-			if (nameptr[0] && nameptr[0] != '#') {
-				// jump over variable name
-				for (valptr = nameptr; *valptr && !std::isspace(*valptr); valptr++) {
-					;
-				}
+			if (*valptr) {    // found blank
+				*valptr = '\0'; // make name a string
 
-				if (*valptr) {    // found blank
-					*valptr = '\0'; // make name a string
+				do {
+					valptr++; // find end of blanks
+				} while (std::isspace(*valptr));
+			}
+			foundit = SetParam(nameptr, valptr, member_params, source_type, source);
 
-					do {
-						valptr++; // find end of blanks
-					} while (std::isspace(*valptr));
-				}
-				foundit = SetParam(nameptr, valptr, member_params, source_type, source);
-
-				if (!foundit) {
+			if (!foundit) {
+				if (surplus) {
+					surplus->add(valptr, nameptr, "<from configfile>");
+				} else {
 					anyerr = true; // had an error
-					tprintError("Failure while processing parameter line #{}: {}  {}\n", linecounter, nameptr, valptr);
+					PARAM_ERROR("Failure while parsing parameter line #{}: {}  {}\n", line.linenumber, nameptr, valptr);
 				}
 			}
 		}
+
+		if (!line.EOF_reached) {
+			anyerr = true; // had an error
+			PARAM_ERROR("Failure while loading parameter line #{}\n", line.linenumber);
+		}
+
 		return anyerr;
 	}
 

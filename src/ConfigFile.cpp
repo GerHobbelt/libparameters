@@ -1,9 +1,14 @@
 
-#include <parameters/ConfigFile.hpp>
+#include <parameters/configreader.h>
+#include <parameters/stdioconfigreader.h>
+#include <parameters/stringconfigreader.h>
+#include <parameters/CString.hpp>
 
 #include "internal_helpers.hpp"
 
 #include <ghc/fs_std.hpp>  // namespace fs = std::filesystem;   or   namespace fs = ghc::filesystem;
+
+#include <libassert/assert.hpp>
 
 
 namespace parameters {
@@ -14,14 +19,15 @@ namespace parameters {
 	//
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	ConfigFile::ConfigFile(const char *path)
+	// Parse '-', 'stdin' and '1' as STDIN, or open a regular text file in UTF8 read mode.
+	//
+	// An error line is printed via `tprintf()` when the given path turns out not to be valid.
+	StdioConfigReader::StdioConfigReader(const char *path)
+		: _f(nullptr)
 	{
 		if (!path || !*path) {
-			_f = nullptr;
 			return;
 		}
-
-		_f = nullptr;
 
 		if (strieq(path, "/dev/stdin") || strieq(path, "stdin") || strieq(path, "-") || strieq(path, "1"))
 			_f = stdin;
@@ -31,12 +37,16 @@ namespace parameters {
 			std::string ps = reinterpret_cast<const char *>(p8.c_str());
 			_f = fopen(ps.c_str(), "r");
 			if (!_f) {
-				tprintError("Cannot open file for reading its content: {}\n", ps);
+				PARAM_ERROR("Cannot open file for reading its content: {}\n", ps);
 			}
 		}
 	}
 
-	ConfigFile::~ConfigFile() {
+	StdioConfigReader::StdioConfigReader(const std::string &path)
+		: StdioConfigReader(path.c_str())
+	{}
+
+	StdioConfigReader::~StdioConfigReader() {
 		if (_f) {
 			if (_f != stdin) {
 				fclose(_f);
@@ -46,8 +56,142 @@ namespace parameters {
 		}
 	}
 
-	FILE *ConfigFile::operator()() const {
+	FILE *StdioConfigReader::operator()() const {
 		return _f;
 	}
+
+	bool StdioConfigReader::ReadInfoLine(ConfigReader::line &line) {
+		line.init();
+		CString<1024> buf;
+	get_next_line:
+		buf.clear();
+		for (;;) {
+			// when we're looping, the next line *appends* the freshly read content into `buf`, thanks to the `shift_start()` call at the end below!
+			char *d = buf.data();
+			char *p = fgets(d, buf.datasize(), _f);
+			if (!p) {
+				// when error is signaled, the data is undetermined: NIL it then!
+				if (ferror(_f)) {
+					*d = 0;
+					line.error = true;
+				}
+				// EOF reached? If we got *anything*, that'll be the last line in the file.
+				line.EOF_reached = feof(_f);
+				if (buf.length() > 0)
+					_lineno++;
+				break;
+			}
+			if (buf.endsWithAny("\r\n")) {
+				_lineno++;
+				break;
+			}
+			// incoming line is larger than expected: enlarge the buffer.
+			buf.shift_start(buf.length());
+			buf.resize(buf.allocsize());
+		}
+		buf.reset_start();
+		buf.Trim();
+		// did we hit an empty line?
+		if (buf.empty()) {
+			goto get_next_line;
+		}
+		// did we hit a comment line?
+		if (buf.startsWithAny("#;")) {
+			goto get_next_line;
+		}
+		if (buf.startsWith("//")) {
+			goto get_next_line;
+		}
+		// we found an actual content line: produce it
+		line.content = buf.c_str();
+		line.linenumber = _lineno;
+		return !((line.EOF_reached && line.content.empty()) || line.error);
+	}
+
+
+
+
+
+
+
+
+
+
+
+	StringConfigReader::StringConfigReader(const char *data, size_t size) {
+		LIBASSERT_ASSERT(data != nullptr);
+		_buffer.assign(data, size);
+	}
+
+	StringConfigReader::StringConfigReader(const uint8_t *data, size_t size) {
+		LIBASSERT_ASSERT(data != nullptr);
+		_buffer.assign(data, size);
+	}
+
+	StringConfigReader::StringConfigReader(const char *data_string) {
+		LIBASSERT_ASSERT(data_string != nullptr);
+		_buffer.assign(data_string);
+	}
+
+	StringConfigReader::StringConfigReader(const std::string &data) {
+		_buffer.assign(data);
+	}
+
+	StringConfigReader::~StringConfigReader() {
+		_buffer.clear();
+	}
+
+	bool StringConfigReader::ReadInfoLine(ConfigReader::line &line) {
+		line.init();
+		if (_buffer.empty()) {
+			// EOF reached. Nothing availabel.
+			line.EOF_reached = true;
+		} else {
+			for (;;) {
+				char *s = _buffer.data();
+				size_t offset = strcspn(s, "\r\n");
+				// did we hit an empty line?
+				if (_buffer.empty()) {
+					line.EOF_reached = true;
+					break;
+				}
+
+				_lineno++;
+				char *e = s + offset;
+				unsigned int lf_count = 0;
+				while (*e && isspace(*e)) {
+					if (*e == '\n')
+						lf_count++;
+					e++;
+				}
+				if (lf_count > 1)
+					_lineno += lf_count - 1;
+
+				size_t shift = (e - s);
+
+				// did we NOT hit a comment line?
+				if (!_buffer.startsWithAny("#;") && !_buffer.startsWith("//")) {
+					e = s + offset;
+					e--;
+					while (e >= s && isspace(*e))
+						e--;
+					e++;
+					//*e = 0;
+					while (s < e && isspace(*s))
+						s++;
+					line.content.assign(s, e);
+					_buffer.shift_start(shift);
+
+					// early notification about EOF:
+					line.EOF_reached = _buffer.empty();
+					break;
+				}
+				_buffer.shift_start(shift);
+			}
+		}
+		return !line.EOF_reached;
+	}
+
+
 
 }  // namespace

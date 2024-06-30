@@ -1,17 +1,13 @@
-//
-// string class which offers a special feature vs. std::string:
-// - the internal buffer can be read/WRITE accessed by external C/C++ code via the data() method,
-//   allowing userland code to use arbitrary, fast, C- code to edit the string content,
-//   including, f.e., injecting NUL sentinels a la strtok() et al.
-// - built-in whitespace trimming methods.
-//
 
 #pragma once
 
-#ifndef _LIB_PARAMS_REPORTFILE_H_
-#define _LIB_PARAMS_REPORTFILE_H_
+#ifndef _LIB_PARAMS_STDIOREPORTFILE_H_
+#define _LIB_PARAMS_STDIOREPORTFILE_H_
+
+#include <parameters/reportwriter.h>
 
 #include <cstdint>
+#include <cstdio>
 #include <string>
 #include <vector>
 
@@ -27,7 +23,7 @@ namespace parameters {
 	//
 	// NOTE: as we need to track the given file path, this will incur a very minor heap memory leak
 	// as we won't ever release the memory allocated for that string in `_processed_file_paths`.
-	class ReportFile {
+	class StdioReportWriter : public ReportWriter {
 	public:
 		// Parse '-', 'stdout' and '1' as STDIN, '+', 'stderr', and '2' as STDERR, or open a regular text file in UTF8 write mode.
 		//
@@ -35,9 +31,12 @@ namespace parameters {
 		// On the other hand, an error line is printed via `tprintf()` when the given path is non-empty and
 		// turns out not to be valid.
 		// Either way, a return value of NULL implies that default behaviour (output via `tprintf()`) is assumed.
-		ReportFile(const char *path);
-		ReportFile(const std::string &path): ReportFile(path.c_str()) {}
-		~ReportFile();
+		StdioReportWriter(const char *path, ReportType target = PARAMREPORT_AS_MARKDOWN_REPORT);
+		StdioReportWriter(const std::string &path, ReportType target = PARAMREPORT_AS_MARKDOWN_REPORT);
+		StdioReportWriter(const char *path, reformatLine_f *custom_postprocessor, ReportType target = PARAMREPORT_CUSTOM_OUTPUT);
+		StdioReportWriter(const std::string &path, reformatLine_f *custom_postprocessor, ReportType target = PARAMREPORT_CUSTOM_OUTPUT);
+
+		virtual ~StdioReportWriter();
 
 		FILE * operator()() const;
 
@@ -45,8 +44,16 @@ namespace parameters {
 			return _f != nullptr;
 		};
 
+	protected:
+		virtual void WriteLineBuffer() override;
+
+	public:
+		virtual void Finalize() override;
+
 	private:
 		FILE *_f;
+		std::string _canonical_filepath;
+		bool _errored;
 
 		// We assume we won't be processing very many file paths through here, so a linear scan through
 		// the set-processed-to-date is considered good enough/best re performance, hence std::vector 
