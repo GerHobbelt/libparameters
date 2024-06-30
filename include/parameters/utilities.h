@@ -125,7 +125,7 @@ namespace parameters {
 		// --------------------------------------------------------------------------------------------------
 
 		// Print all parameters in the given set(s) to the given output.
-		static void PrintParams(ReportWriter &dst, const ParamsVectorSet &set, bool print_explanatory_comments = true, const char *section_title = nullptr);
+		static void PrintParams(ReportWriter &dst, const ParamsVectorSet &set, ReportWriter::ParamInfoElement show_elements_style = ReportWriter::PARAMINFO_EXPLANATORY_STATUSREPORT_LINE, const char *section_title = nullptr);
 
 		// Report parameters' usage statistics, i.e. report which params have been
 		// set, modified and read/checked until now during this run-time's lifetime.
@@ -146,7 +146,7 @@ namespace parameters {
 		// which may be stdout/stderr.
 		//
 		// When `set` is empty, the `GlobalParams()` vector will be assumed instead.
-		static void ReportParamsUsageStatistics(ReportWriter &dst, const ParamsVectorSet &set, bool report_unused_params = false, const char *section_title = nullptr);
+		static void ReportParamsUsageStatistics(ReportWriter &dst, const ParamsVectorSet &set, bool report_unused_params = false, ReportWriter::ParamInfoElement show_elements_style = ReportWriter::PARAMINFO_EXPLANATORY_STATUSREPORT_LINE, const char *section_title = nullptr);
 
 		// --------------------------------------------------------------------------------------------------
 

@@ -74,7 +74,7 @@ namespace parameters {
 
 
 	// Print all parameters in the given set(s) to the given output.
-	void ParamUtils::PrintParams(ReportWriter &dst, const ParamsVectorSet &set, bool print_explanatory_comments, const char *section_title) {
+	void ParamUtils::PrintParams(ReportWriter &dst, const ParamsVectorSet &set, ReportWriter::ParamInfoElement show_elements_style, const char *section_title) {
 #if 0
 		std::ostringstream stream;
 		stream.imbue(std::locale::classic());
@@ -82,12 +82,12 @@ namespace parameters {
 		if (!section_title || !*section_title)
 			section_title = ParamUtils::GetApplicationName().c_str();
 
-		dst.WriteHeaderLine(fmt::format("# {} parameters overview", section_title));
+		dst.WriteHeaderLine(fmt::format("{} parameters overview", section_title), 1);
 
 		for (ParamsVector *vec : set.get()) {
 			LIBASSERT_DEBUG_ASSERT(vec != nullptr);
 
-			dst.WriteHeaderLine(fmt::format("## {}", vec->title()));
+			dst.WriteHeaderLine(vec->title(), 2);
 
 			// sort the parameters by name, per vectorset / section:
 			std::vector<ParamPtr> params = vec->as_list();
@@ -112,7 +112,7 @@ namespace parameters {
 			});
 
 			for (ParamPtr param : params) {
-				dst.WriteParamInfoLine(*param, print_explanatory_comments);
+				dst.WriteParamInfoLine(param, print_explanatory_comments);
 			}
 		}
 	}
@@ -136,17 +136,17 @@ namespace parameters {
 	// which may be stdout/stderr.
 	//
 	// When `set` is empty, the `GlobalParams()` vector will be assumed instead.
-	void ParamUtils::ReportParamsUsageStatistics(ReportWriter &dst, const ParamsVectorSet &set, bool is_section_subreport, bool report_unused_params, const char *section_title) {
+	void ParamUtils::ReportParamsUsageStatistics(ReportWriter &dst, const ParamsVectorSet &set, bool report_unused_params, ReportWriter::ParamInfoElement show_elements_style, const char *section_title) {
 		if (!section_title || !*section_title)
 			section_title = ParamUtils::GetApplicationName().c_str();
 
-		dst.WriteHeaderLine(fmt::format("# {}: Parameter Usage Statistics: which params have been relevant?", section_title));
+		dst.WriteHeaderLine(fmt::format("{}: Parameter Usage Statistics: which params have been relevant?", section_title), 1);
 
 		// first collect all parameters and sort them:
 		for (ParamsVector *vec : set.get()) {
 			LIBASSERT_DEBUG_ASSERT(vec != nullptr);
 
-			dst.WriteHeaderLine(fmt::format("## {}", vec->title()));
+			dst.WriteHeaderLine(vec->title(), 2);
 
 			// sort the parameters by name, per vectorset / section:
 			std::vector<ParamPtr> params = vec->as_list();
@@ -301,23 +301,6 @@ namespace parameters {
 
 
 
-
-	static inline const char *type_as_str(ParamType type) {
-		switch (type) {
-		case INT_PARAM:
-			return "[Integer]";
-		case BOOL_PARAM:
-			return "[Boolean]";
-		case DOUBLE_PARAM:
-			return "[Float]";
-		case STRING_PARAM:
-			return "[String]";
-		case ANY_TYPE_PARAM:
-			return "[ANY]";
-		default:
-			return "[???]";
-		}
-	}
 
 
 
