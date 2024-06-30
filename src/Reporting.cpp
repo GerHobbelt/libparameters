@@ -64,7 +64,7 @@ namespace parameters {
 		if (access > 2)
 			access = 2;
 		return access;
-		}
+	}
 
 	static inline int clip(int access) {
 		if (access > 999)
@@ -140,35 +140,35 @@ namespace parameters {
 		if (!section_title || !*section_title)
 			section_title = ParamUtils::GetApplicationName().c_str();
 
-			dst.WriteHeaderLine(fmt::format("# {}: Parameter Usage Statistics: which params have been relevant?", section_title));
+		dst.WriteHeaderLine(fmt::format("# {}: Parameter Usage Statistics: which params have been relevant?", section_title));
 
-			// first collect all parameters and sort them:
-			for (ParamsVector *vec : set.get()) {
-				LIBASSERT_DEBUG_ASSERT(vec != nullptr);
+		// first collect all parameters and sort them:
+		for (ParamsVector *vec : set.get()) {
+			LIBASSERT_DEBUG_ASSERT(vec != nullptr);
 
-				dst.WriteHeaderLine(fmt::format("## {}", vec->title()));
+			dst.WriteHeaderLine(fmt::format("## {}", vec->title()));
 
-				// sort the parameters by name, per vectorset / section:
-				std::vector<ParamPtr> params = vec->as_list();
-				std::sort(params.begin(), params.end(), [](const ParamPtr& a, const ParamPtr& b)
+			// sort the parameters by name, per vectorset / section:
+			std::vector<ParamPtr> params = vec->as_list();
+			std::sort(params.begin(), params.end(), [](const ParamPtr& a, const ParamPtr& b)
+			{
+			int rv = sign_of_diff(a->is_init(), b->is_init());
+			if (rv == 0)
+			{
+				rv = sign_of_diff(b->is_debug(), a->is_debug());
+				if (rv == 0)
 				{
-						int rv = sign_of_diff(a->is_init(), b->is_init());
-						if (rv == 0)
-						{
-							rv = sign_of_diff(b->is_debug(), a->is_debug());
-							if (rv == 0)
-							{
-								rv = strcmp(b->name_str(), a->name_str());
+					rv = strcmp(b->name_str(), a->name_str());
 #if !defined(NDEBUG)
-								if (rv == 0)
-								{
-									LIBASSERT_PANIC(fmt::format("Apparently you have double-defined a {} Variable: '{}'! Fix that in the source code!\n", ParamUtils::GetApplicationName(), a->name_str()).c_str());
-								}
+					if (rv == 0)
+					{
+						LIBASSERT_PANIC(fmt::format("Apparently you have double-defined a {} Variable: '{}'! Fix that in the source code!\n", ParamUtils::GetApplicationName(), a->name_str()).c_str());
+					}
 #endif
-							}
-						}
-						return (rv >= 0);
-				});
+				}
+			}
+			return (rv >= 0);
+			});
 
 			static const char* categories[] = {"(Global)", "(Local)"};
 			static const char* sections[] = {"", "(Init)", "(Debug)", "(Init+Dbg)"};
@@ -299,7 +299,7 @@ namespace parameters {
 
 
 
-	
+
 
 
 	static inline const char *type_as_str(ParamType type) {
@@ -371,27 +371,27 @@ namespace parameters {
 
 		sort(params.begin(), params.end(), [](ParamInfo& a, ParamInfo& b)
 		{
-				int rv = (int)a.global - (int)b.global;
+			int rv = (int)a.global - (int)b.global;
+			if (rv == 0)
+			{
+				rv = (int)a.p->is_init() - (int)b.p->is_init();
 				if (rv == 0)
 				{
-					rv = (int)a.p->is_init() - (int)b.p->is_init();
+					rv = (int)b.p->is_debug() - (int)a.p->is_debug();
 					if (rv == 0)
 					{
-						rv = (int)b.p->is_debug() - (int)a.p->is_debug();
+						rv = strcmp(b.p->name_str(), a.p->name_str());
+#if !defined(NDEBUG)
 						if (rv == 0)
 						{
-							rv = strcmp(b.p->name_str(), a.p->name_str());
-#if !defined(NDEBUG)
-							if (rv == 0)
-							{
-								fprintf(stderr, "Apparently you have double-defined {} Variable: '%s'! Fix that in the source code!\n", ParamUtils::GetApplicationName(), a.p->name_str());
-								ASSERT0(!"Apparently you have double-defined a Variable.");
-							}
-#endif
+							fprintf(stderr, "Apparently you have double-defined {} Variable: '%s'! Fix that in the source code!\n", ParamUtils::GetApplicationName(), a.p->name_str());
+							ASSERT0(!"Apparently you have double-defined a Variable.");
 						}
+#endif
 					}
 				}
-				return (rv >= 0);
+			}
+			return (rv >= 0);
 		});
 
 		static const char* categories[] = {"(Global)", "(Local)"};
@@ -630,7 +630,7 @@ namespace parameters {
 	}
 
 
-	
+
 
 	static std::string params_appname_4_reporting = ParamUtils::GetApplicationName();
 

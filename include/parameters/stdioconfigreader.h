@@ -16,7 +16,7 @@ namespace parameters {
 	// --------------------------------------------------------------------------------------------------
 
 	// A simple FILE/stdio wrapper class which supports reading from stdin or regular file.
-	class StdioConfigReader : public ConfigReader {
+	class StdioConfigReader: public ConfigReader {
 	public:
 		// Parse '-', 'stdin' and '1' as STDIN, or open a regular text file in UTF8 read mode.
 		//

@@ -514,5 +514,5 @@ namespace parameters {
 		ParamsVectorSet pvec({&set});
 		return SetParam(name, value, pvec, source_type, source);
 	}
-	
+
 }  // namespace

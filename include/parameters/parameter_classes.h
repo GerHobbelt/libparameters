@@ -38,11 +38,11 @@ namespace parameters {
 
 		ANY_TYPE_PARAM =    0x03FF, // catch-all identifier for the selection/filter functions: there this is used to match *any and all* parameter value types encountered.
 	};
-DECL_FMT_FORMAT_PARAMENUMTYPE(ParamType);
+	DECL_FMT_FORMAT_PARAMENUMTYPE(ParamType);
 
-static inline auto format_as(ParamType t) {
-  return fmt::underlying(t);
-}
+	static inline auto format_as(ParamType t) {
+		return fmt::underlying(t);
+	}
 
 	// Identifiers used to indicate the *origin* of the current parameter value. Used for reporting/diagnostic purposes. Do not treat these
 	// as gospel; these are often assigned under limited/reduced information conditions, so they merely serve as report *hints*.
@@ -57,11 +57,11 @@ static inline auto format_as(ParamType t) {
 		PARAM_VALUE_IS_SET_BY_APPLICATION,    // 'explicit' write: user / application code set the param value, whatever it is now.
 		PARAM_VALUE_IS_SET_BY_CORE_RUN,       // 'explicit' write by the running application core: before proceding with the next step the run-time adjusts this one, e.g. (incrementing) page number while processing a multi-page OCR run.
 	};
-DECL_FMT_FORMAT_PARAMENUMTYPE(ParamSetBySourceType);
+	DECL_FMT_FORMAT_PARAMENUMTYPE(ParamSetBySourceType);
 
-static inline auto format_as(ParamSetBySourceType t) {
-  return fmt::underlying(t);
-}
+	static inline auto format_as(ParamSetBySourceType t) {
+		return fmt::underlying(t);
+	}
 
 	// --------------------------------------------------------------------------------------------------
 

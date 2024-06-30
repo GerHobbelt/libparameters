@@ -17,7 +17,7 @@
 
 namespace parameters {
 
-// Custom equivalent of std::hash<Param> + std::equal_to<Param> for std::unordered_map<const char *key, Param & value>.
+	// Custom equivalent of std::hash<Param> + std::equal_to<Param> for std::unordered_map<const char *key, Param & value>.
 	class ParamHash
 	{
 	public:
@@ -56,10 +56,10 @@ namespace parameters {
 		ParamHash /* equality check */
 	> ParamsHashTableType;
 
-// --------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------
 
-// A set (vector) of parameters. While this is named *vector* the internal organization
-// is hash table based to provide fast random-access add / remove / find functionality.
+	// A set (vector) of parameters. While this is named *vector* the internal organization
+	// is hash table based to provide fast random-access add / remove / find functionality.
 	class ParamsVector {
 	private:
 		ParamsHashTableType params_;
@@ -124,7 +124,7 @@ namespace parameters {
 // A set (vector) of surplus parameters, i.e. parameters which are defined at run-time, rather than at compile-time.
 // This SurplusParamsVector class is the owner of each of these (heap allocated) parameters, which are created on demand
 // when calling the add() method.
-	class SurplusParamsVector : public ParamsVector {
+	class SurplusParamsVector: public ParamsVector {
 	public:
 		SurplusParamsVector() = delete;
 		SurplusParamsVector(const char* title);

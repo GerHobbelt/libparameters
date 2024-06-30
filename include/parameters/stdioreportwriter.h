@@ -23,7 +23,7 @@ namespace parameters {
 	//
 	// NOTE: as we need to track the given file path, this will incur a very minor heap memory leak
 	// as we won't ever release the memory allocated for that string in `_processed_file_paths`.
-	class StdioReportWriter : public ReportWriter {
+	class StdioReportWriter: public ReportWriter {
 	public:
 		// Parse '-', 'stdout' and '1' as STDIN, '+', 'stderr', and '2' as STDERR, or open a regular text file in UTF8 write mode.
 		//

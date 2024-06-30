@@ -11,13 +11,13 @@
 #include <parameters/parameter_globals.h>
 
 
-	/*************************************************************************
-	 * Note on defining parameters.
-	 *
-	 * The values of the parameters defined with *_INIT_* macros are guaranteed
-	 * to be loaded from config files before Tesseract initialization is done
-	 * (there is no such guarantee for parameters defined with the other macros).
-	 *************************************************************************/
+/*************************************************************************
+ * Note on defining parameters.
+ *
+ * The values of the parameters defined with *_INIT_* macros are guaranteed
+ * to be loaded from config files before Tesseract initialization is done
+ * (there is no such guarantee for parameters defined with the other macros).
+ *************************************************************************/
 
 #define INT_VAR_H(name) ::parameters::IntParam name
 

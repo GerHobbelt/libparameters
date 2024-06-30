@@ -25,7 +25,7 @@ namespace parameters {
 	template <size_t SMALL_STRING_ALLOCSIZE = 16>
 	class CString {
 	public:
-		CString() noexcept :
+		CString() noexcept:
 			_buffer(_small_buffer),
 			_allocsize(SMALL_STRING_ALLOCSIZE),
 			_str_start_offset(0),
@@ -33,7 +33,7 @@ namespace parameters {
 		{
 			_small_buffer[0] = 0;
 		}
-		CString(size_t allocate_size, size_t alloc_offset = 0) :
+		CString(size_t allocate_size, size_t alloc_offset = 0):
 			_buffer(nullptr),
 			_allocsize(allocate_size),
 			_str_start_offset(alloc_offset),
@@ -53,7 +53,7 @@ namespace parameters {
 			}
 			memset(_buffer, 0, _str_start_offset + 1);
 		}
-		CString(const char *str, size_t alloc_offset = 0) :
+		CString(const char *str, size_t alloc_offset = 0):
 			_buffer(nullptr),
 			_allocsize(SMALL_STRING_ALLOCSIZE),
 			_str_start_offset(alloc_offset)
@@ -199,8 +199,7 @@ namespace parameters {
 				// shrink!
 				_contentsize = _str_start_offset + new_content_length;
 				_buffer[_contentsize] = 0;
-			}
-			else if (new_content_length > l) {
+			} else if (new_content_length > l) {
 				// grow! pad the content with NUL bytes!
 				size_t new_contentsize = _str_start_offset + new_content_length;
 				if (new_contentsize >= _allocsize) {
@@ -284,9 +283,9 @@ namespace parameters {
 		}
 
 		bool startsWith(const char *prefix) {
-		const char *s = data();
-		size_t pl = strlen(prefix);
-		return (0 == strncmp(s, prefix, pl));
+			const char *s = data();
+			size_t pl = strlen(prefix);
+			return (0 == strncmp(s, prefix, pl));
 		}
 
 		bool startsWith(char prefix) {

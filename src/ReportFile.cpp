@@ -22,7 +22,7 @@ namespace parameters {
 	// predefined formatters for the two predefined report types:
 	//
 	//		PARAMREPORT_AS_MARKDOWN_REPORT
-  //		PARAMREPORT_AS_CONFIGFILE
+	//		PARAMREPORT_AS_CONFIGFILE
 	//
 	// We also provide a bare bones formatter for the custom userland format (PARAMREPORT_CUSTOM_OUTPUT), in case the userland code forgets to specify one.
 	//
@@ -55,11 +55,11 @@ namespace parameters {
 	ReportWriter::ReportWriter(ReportType target)
 		: _postprocessor(pick_default_formatter_for_given_target(target))
 		, _active_level(0)
-		,	_type(target)
+		, _type(target)
 	{}
 
 	ReportWriter::ReportWriter(reformatLine_f *custom_postprocessor, ReportType target)
-	: _postprocessor(custom_postprocessor != nullptr ? custom_postprocessor : pick_default_formatter_for_given_target(target))
+		: _postprocessor(custom_postprocessor != nullptr ? custom_postprocessor : pick_default_formatter_for_given_target(target))
 		, _active_level(0)
 		, _type(target)
 	{}
@@ -70,7 +70,7 @@ namespace parameters {
 
 	void ReportWriter::SetPostprocessor(reformatLine_f *custom_postprocessor) {
 		_postprocessor = (custom_postprocessor != nullptr ? custom_postprocessor : pick_default_formatter_for_given_target(_type));
-		}
+	}
 
 
 
@@ -206,7 +206,7 @@ namespace parameters {
 
 	void ReportWriter::WriteLineBuffer() {
 		// nada. zilch.
-  }
+	}
 
 	void ReportWriter::Finalize() {
 		// nada. zilch.
@@ -231,16 +231,16 @@ namespace parameters {
 	StringReportWriter::StringReportWriter(ReportWriter::reformatLine_f *custom_postprocessor, ReportWriter::ReportType target)
 		: ReportWriter(custom_postprocessor, target)
 	{}
-		StringReportWriter::~StringReportWriter() = default;
+	StringReportWriter::~StringReportWriter() = default;
 
-		std::string StringReportWriter::to_string() const {
-			return _buffer.c_str();
-		}
+	std::string StringReportWriter::to_string() const {
+		return _buffer.c_str();
+	}
 
 
-		CString<> &StringReportWriter::data() {
-			return _buffer;
-		}
+	CString<> &StringReportWriter::data() {
+		return _buffer;
+	}
 
 
 
@@ -260,7 +260,7 @@ namespace parameters {
 		: StdioReportWriter(path, nullptr, target)
 	{}
 	StdioReportWriter::StdioReportWriter(const std::string &path, ReportType target)
-	: StdioReportWriter(path.c_str(), nullptr, target)
+		: StdioReportWriter(path.c_str(), nullptr, target)
 	{}
 	StdioReportWriter::StdioReportWriter(const std::string &path, reformatLine_f *custom_postprocessor, ReportType target)
 		: StdioReportWriter(path.c_str(), custom_postprocessor, target)
@@ -278,12 +278,10 @@ namespace parameters {
 		if (strieq(path, "/dev/stdout") || strieq(path, "stdout") || strieq(path, "-") || strieq(path, "1")) {
 			_f = stdout;
 			_canonical_filepath = "/dev/stdout";
-		}
-		else if (strieq(path, "/dev/stderr") || strieq(path, "stderr") || strieq(path, "+") || strieq(path, "2")) {
+		} else if (strieq(path, "/dev/stderr") || strieq(path, "stderr") || strieq(path, "+") || strieq(path, "2")) {
 			_f = stderr;
 			_canonical_filepath = "/dev/stderr";
-		}
-		else {
+		} else {
 			bool first = true;
 			fs::path p = fs::weakly_canonical(path);
 			std::u8string p8 = p.u8string();
