@@ -7,11 +7,11 @@
 #ifndef _LIB_PARAMS_CLASSES_H_
 #define _LIB_PARAMS_CLASSES_H_
 
+#include <parameters/fmt-support.h>
 #include <cstdint>
 #include <string>
 #include <vector>
 #include <functional>
-#include <parameters/fmt-support.h>
 
 
 namespace parameters {

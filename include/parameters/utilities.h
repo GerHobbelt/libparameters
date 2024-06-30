@@ -7,10 +7,11 @@
 #ifndef _LIB_PARAMS_UTILS_H_
 #define _LIB_PARAMS_UTILS_H_
 
-#include <parameters/parameters.h>
+#include <parameters/parameter_classes.h>
 #include <parameters/parameter_sets.h>
-#include <parameters/reportwriter.h>
 #include <parameters/configreader.h>
+#include <parameters/reportwriter.h>
+#include <parameters/CString.hpp>
 
 #include <cstdint>
 #include <string>
@@ -19,9 +20,6 @@
 namespace parameters {
 
 #include <parameters/sourceref_defstart.h>
-
-	class ConfigReader;
-	class ReportWriter;
 
 	// --------------------------------------------------------------------------------------------------
 

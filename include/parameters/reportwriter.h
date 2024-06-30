@@ -7,13 +7,11 @@
 #ifndef _LIB_PARAMS_REPORTWRITER_H_
 #define _LIB_PARAMS_REPORTWRITER_H_
 
-#include <parameters/parameters.h>
+#include <parameters/parameter_classes.h>
 #include <parameters/parameter_sets.h>
 #include <parameters/CString.hpp>
 
 #include <cstdint>
-#include <string>
-#include <vector>
 
 
 namespace parameters {

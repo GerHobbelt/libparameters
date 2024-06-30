@@ -7,7 +7,7 @@
 #ifndef _LIB_PARAMS_VECTORSETS_H_
 #define _LIB_PARAMS_VECTORSETS_H_
 
-#include <parameters/parameters.h>
+#include <parameters/parameter_classes.h>
 
 #include <cstdint>
 #include <string>

@@ -7,8 +7,6 @@
 #ifndef _LIB_PARAMS_CONFIGREADER_H_
 #define _LIB_PARAMS_CONFIGREADER_H_
 
-#include <parameters/parameters.h>
-
 #include <cstdint>
 #include <string>
 

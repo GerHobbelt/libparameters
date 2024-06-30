@@ -12,6 +12,10 @@
 #include <parameters/utilities.h>
 #include <parameters/configreader.h>
 #include <parameters/reportwriter.h>
+#include <parameters/stdioconfigreader.h>
+#include <parameters/stdioreportwriter.h>
+#include <parameters/stringconfigreader.h>
+#include <parameters/stringreportwriter.h>
 #include <parameters/HelperMacros.hpp>
 #include <parameters/CString.hpp>
 

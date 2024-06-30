@@ -1,19 +1,9 @@
 
 #include <parameters/parameters.h>
-#include <parameters/reportwriter.h>
-#include <parameters/configreader.h>
-#include <parameters/stdioreportwriter.h>
-#include <parameters/stringreportwriter.h>
-#include <parameters/stdioconfigreader.h>
-#include <parameters/stringconfigreader.h>
-#include <parameters/utilities.h>
 
 #include "internal_helpers.hpp"
-
-#include <algorithm>
-
-#include <fmt/format.h>
-#include <spdlog/spdlog.h>
+#include "logchannel_helpers.hpp"
+#include "os_platform_helpers.hpp"
 
 
 namespace parameters {

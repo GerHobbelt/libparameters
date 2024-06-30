@@ -7,7 +7,8 @@
 #ifndef _LIB_PARAMS_MACROS_H_
 #define _LIB_PARAMS_MACROS_H_
 
-#include <parameters/parameters.h>
+#include <parameters/parameter_classes.h>
+#include <parameters/parameter_sets.h>
 #include <parameters/parameter_globals.h>
 
 

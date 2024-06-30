@@ -1,81 +1,44 @@
 
 #pragma once
 
-#include <libassert/assert.hpp>		// we use libassert for our assertions
+#include <parameters/parameter_classes.h>
+#include <parameters/parameter_sets.h>
 
-#include <fmt/base.h>
-#include <fmt/format.h>
-
-#include <climits> // for INT_MIN, INT_MAX
-#include <cmath>   // for NAN, std::isnan
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <locale>  // for std::locale::classic
-#include <sstream> // for std::stringstream
-#include <functional>
-#include <exception>
-#include <cctype>  // for std::toupper
 #include <type_traits>
-#include <cerrno>
-#include <cstdint>
-#include <string>
-#include <vector>
-#include <variant>
-#include <unordered_map>
-#include <memory>
-
-
-#ifdef _WIN32
-#define NOMINMAX
-#  include <windows.h>
-#  define strcasecmp _stricmp
-#  define strncasecmp _strnicmp
-#else
-#  include <strings.h>
-#endif
-
-#include "helpers.h"
-
-#ifndef E_OK
-#define E_OK 0
-#endif
-
-
 
 namespace parameters {
 
-	static inline bool strieq(const char *s1, const char *s2) {
-		return strcasecmp(s1, s2) == 0;
+#define THE_4_HANDLERS_PROTO                                                    \
+  const char *name, const char *comment, ParamsVector &owner, bool init,        \
+  ParamOnModifyFunction on_modify_f, ParamOnValidateFunction on_validate_f,     \
+  ParamOnParseFunction on_parse_f, ParamOnFormatFunction on_format_f
+
+
+	// -- local helper functions --
+
+	using statistics_uint_t = decltype(Param::access_counts_t().reading);
+	using statistics_lumpsum_uint_t = decltype(Param::access_counts_t().prev_sum_reading);
+
+	// increment value, prevent overflow, a.k.a. wrap-around, i.e. clip to maximum value
+	template <class T, typename = std::enable_if_t<std::is_unsigned<T>::value>>
+	static inline void safe_inc(T& sum) {
+		sum++;
+		// did a wrap-around just occur? if so, compensate by rewinding to max value.
+		if (sum == T(0))
+			sum--;
 	}
 
-	static inline bool SafeAtoi(const char* str, int* val) {
-		char* endptr = nullptr;
-		*val = strtol(str, &endptr, 10);
-		return endptr != nullptr && *endptr == '\0';
+	// add value to sum, prevent overflow, a.k.a. wrap-around, i.e. clip sum to maximum value
+	template <class SumT, class ValT, typename = std::enable_if_t<std::is_unsigned<SumT>::value && std::is_unsigned<ValT>::value>>
+	static inline void safe_add(SumT &sum, const ValT value) {
+		// conditional check is shaped to work in overflow conditions
+		if (sum < SumT(0) - 1 - value) // sum + value < max?  ==>  sum < max - value?
+			sum += value;
+		else                           // clip/limit ==>  sum = max
+			sum = SumT(0) - 1;
 	}
 
-	static inline bool is_legal_fpval(double val) {
-		return !std::isnan(val) && val != HUGE_VAL && val != -HUGE_VAL;
-	}
-
-	static inline bool is_single_word(const char* s) {
-		if (!*s)
-			return false;
-		while (isalpha(*s))
-			s++;
-		while (isspace(*s))
-			s++;
-		return (!*s); // string must be at the end now...
-	}
-
-	static inline bool is_optional_whitespace(const char* s) {
-		if (!*s)
-			return false;
-		while (isspace(*s))
-			s++;
-		return (!*s); // string must be at the end now...
-	}
+	// --- end of helper functions set ---
 
 
 }   // namespace
