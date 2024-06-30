@@ -678,7 +678,7 @@ namespace parameters {
 		RefTypedParam(const char *value, const Assistant &assist, THE_4_HANDLERS_PROTO);
 		RefTypedParam(const T &value, const Assistant &assist, THE_4_HANDLERS_PROTO);
 		explicit RefTypedParam(const T *value, const Assistant &assist, THE_4_HANDLERS_PROTO);
-		virtual ~RefTypedParam() = default;
+		virtual ~RefTypedParam();
 
 		//operator T() const;
 		operator const T&() const;
@@ -762,6 +762,7 @@ namespace parameters {
 	protected:
 		T value_;
 		T default_;
+		Assistant assistant_;
 	};
 
 	// --------------------------------------------------------------------------------------------------
@@ -918,7 +919,7 @@ namespace parameters {
 	public:
 		ObjectVectorTypedParam(const char *value, const Assistant &assist, THE_4_HANDLERS_PROTO);
 		ObjectVectorTypedParam(const VecT &value, const Assistant &assist, THE_4_HANDLERS_PROTO);
-		virtual ~ObjectVectorTypedParam() = default;
+		virtual ~ObjectVectorTypedParam();
 
 		// operator T() const;
 		operator const VecT &() const;

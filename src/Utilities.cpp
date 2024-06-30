@@ -79,7 +79,8 @@ namespace parameters {
 		char *valptr;         // value field
 
 		while (fp.ReadInfoLine(line)) {
-			nameptr = line.content.data();
+			// we know what we're doing: the CString buffer will be live for the duration and here we can subdivide the line fetched from that buffer:
+			nameptr =	const_cast<char *>(line.content.data());
 
 			// jump over variable name
 			for (valptr = nameptr; *valptr && !std::isspace(*valptr); valptr++) {

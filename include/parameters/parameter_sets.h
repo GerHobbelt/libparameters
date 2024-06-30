@@ -61,7 +61,7 @@ namespace parameters {
 	// A set (vector) of parameters. While this is named *vector* the internal organization
 	// is hash table based to provide fast random-access add / remove / find functionality.
 	class ParamsVector {
-	private:
+	protected:
 		ParamsHashTableType params_;
 		bool is_params_owner_ = false;
 		std::string title_;
@@ -98,6 +98,7 @@ namespace parameters {
 
 		void remove(ParamPtr param_ref);
 		void remove(ParamRef param_ref);
+		void remove(const char *name);
 
 		const char* title() const;
 		void change_title(const char* title);
@@ -140,20 +141,21 @@ namespace parameters {
 		void add(const bool value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(BoolParam));
 		void add(const double value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(DoubleParam));
 		void add(const std::string &value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(StringParam));
-		void add(const std::vector<int32_t> value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(IntSetParam));
-		void add(const std::vector<bool> value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(BoolSetParam));
-		void add(const std::vector<double> value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(DoubleSetParam));
-		void add(const std::vector<std::string> &value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(StringSetParam));
+
+		void add(const std::vector<int32_t> value, const BasicVectorParamParseAssistant &assistant, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(IntSetParam));
+		void add(const std::vector<bool> value, const BasicVectorParamParseAssistant &assistant, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(BoolSetParam));
+		void add(const std::vector<double> value, const BasicVectorParamParseAssistant &assistant, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(DoubleSetParam));
+		void add(const std::vector<std::string> &value, const BasicVectorParamParseAssistant &assistant, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(StringSetParam));
 
 		void add(const char *value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(StringParam));
 
 #undef THE_4_HANDLERS_PROTO
 
+	protected:
 		void add(ParamPtr param_ref);
 		void add(std::initializer_list<ParamPtr> vecs);
 
-		void remove(ParamPtr param_ref);
-
+	public:
 		friend class ParamsVectorSet;
 	};
 

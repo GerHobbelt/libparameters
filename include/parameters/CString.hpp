@@ -109,16 +109,30 @@ namespace parameters {
 		// trim leading whitespace.
 		void TrimLeft() {
 			char* p = data();
-			while (isspace(*p))
+			while (std::isspace(*p))
 				p++;
 			_str_start_offset = p - _buffer;
 		};
+
+		// Return the number of newlines (LF chars) in the trimmed lead.
+		unsigned int TrimLeftCountingNewlines() {
+			const char *p = data();
+			unsigned int lf_count = 0;
+			while (*p && std::isspace(*p)) {
+				if (*p == '\n')
+					lf_count++;
+				p++;
+			}
+			_str_start_offset = p - _buffer;
+			return lf_count;
+		}
+
 		// trim trailing whitespace.
 		void TrimRight() {
 			char* p = data();
 			char *e = p + length();
 			e--;
-			while (e >= p && (isspace(*e) || !*e))
+			while (e >= p && (std::isspace(*e) || !*e))
 				*e--;
 			e++;
 			*e = 0;

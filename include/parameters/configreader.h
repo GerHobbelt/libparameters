@@ -37,7 +37,7 @@ namespace parameters {
 		virtual ~ConfigReader() = default;
 
 		struct line {
-			std::string content;
+			std::string_view content;
 			unsigned int linenumber;
 			bool EOF_reached;
 			bool error;
@@ -47,7 +47,7 @@ namespace parameters {
 			}
 			~line() = default;
 			void init() {
-				content.clear();
+				content = std::string_view(); // .clear();
 				linenumber = 0;
 				EOF_reached = false;
 				error = false;

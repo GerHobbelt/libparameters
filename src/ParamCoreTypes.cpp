@@ -126,6 +126,7 @@ namespace parameters {
 		}
 	}
 
+	template<>
 	IntParam::ValueTypedParam(const int32_t value, THE_4_HANDLERS_PROTO)
 		: Param(name, comment, owner, init),
 		on_modify_f_(on_modify_f ? on_modify_f : IntParam_ParamOnModifyFunction),
@@ -138,14 +139,17 @@ namespace parameters {
 		type_ = INT_PARAM;
 	}
 
+	template<>
 	IntParam::operator int32_t() const {
 		return value();
 	}
 
+	template<>
 	void IntParam::operator=(const int32_t value) {
 		set_value(value, ParamUtils::get_current_application_default_param_source_type(), nullptr);
 	}
 
+	template<>
 	void IntParam::set_value(const char *v, ParamSetBySourceType source_type, ParamPtr source) {
 		unsigned int pos = 0;
 		std::string vs(v);
@@ -209,6 +213,7 @@ namespace parameters {
 	// When no source vector is specified, or when the source vector does not specify this
 	// particular parameter, then our value is reset to the default value which was
 	// specified earlier in our constructor.
+	template<>
 	void IntParam::ResetToDefault(const ParamsVectorSet *source_vec, ParamSetBySourceType source_type) {
 		if (source_vec != nullptr) {
 			IntParam *source = source_vec->find<IntParam>(name_str());
@@ -220,12 +225,14 @@ namespace parameters {
 		set_value(default_, PARAM_VALUE_IS_RESET, nullptr);
 	}
 
+	template<>
 	std::string IntParam::value_str(ValueFetchPurpose purpose) const {
 		if (purpose == VALSTR_PURPOSE_DATA_4_USE)
 			safe_inc(access_counts_.reading);
 		return on_format_f_(*this, value_, default_, purpose);
 	}
 
+	template<>
 	IntParam::ParamOnModifyFunction IntParam::set_on_modify_handler(IntParam::ParamOnModifyFunction on_modify_f) {
 		IntParam::ParamOnModifyFunction rv = on_modify_f_;
 		if (!on_modify_f)
@@ -233,9 +240,11 @@ namespace parameters {
 		on_modify_f_ = on_modify_f;
 		return rv;
 	}
+	template<>
 	void IntParam::clear_on_modify_handler() {
 		on_modify_f_ = IntParam_ParamOnModifyFunction;
 	}
+	template<>
 	IntParam::ParamOnValidateFunction IntParam::set_on_validate_handler(IntParam::ParamOnValidateFunction on_validate_f) {
 		IntParam::ParamOnValidateFunction rv = on_validate_f_;
 		if (!on_validate_f)
@@ -243,9 +252,11 @@ namespace parameters {
 		on_validate_f_ = on_validate_f;
 		return rv;
 	}
+	template<>
 	void IntParam::clear_on_validate_handler() {
 		on_validate_f_ = IntParam_ParamOnValidateFunction;
 	}
+	template<>
 	IntParam::ParamOnParseFunction IntParam::set_on_parse_handler(IntParam::ParamOnParseFunction on_parse_f) {
 		IntParam::ParamOnParseFunction rv = on_parse_f_;
 		if (!on_parse_f)
@@ -253,9 +264,11 @@ namespace parameters {
 		on_parse_f_ = on_parse_f;
 		return rv;
 	}
+	template<>
 	void IntParam::clear_on_parse_handler() {
 		on_parse_f_ = IntParam_ParamOnParseFunction;
 	}
+	template<>
 	IntParam::ParamOnFormatFunction IntParam::set_on_format_handler(IntParam::ParamOnFormatFunction on_format_f) {
 		IntParam::ParamOnFormatFunction rv = on_format_f_;
 		if (!on_format_f)
@@ -263,19 +276,23 @@ namespace parameters {
 		on_format_f_ = on_format_f;
 		return rv;
 	}
+	template<>
 	void IntParam::clear_on_format_handler() {
 		on_format_f_ = IntParam_ParamOnFormatFunction;
 	}
 
 #if 0
+	template<>
 	bool IntParam::set_value(const char *v, ParamSetBySourceType source_type, ParamPtr source) {
 		int32_t val = 0;
 		return SafeAtoi(v, &val) && set_value(val, source_type, source);
 	}
+	template<>
 	bool IntParam::set_value(bool v, ParamSetBySourceType source_type, ParamPtr source) {
 		int32_t val = !!v;
 		return set_value(val, source_type, source);
 	}
+	template<>
 	bool IntParam::set_value(double v, ParamSetBySourceType source_type, ParamPtr source) {
 		v = roundf(v);
 		if (v < INT32_MIN || v > INT32_MAX)
@@ -463,6 +480,7 @@ namespace parameters {
 		}
 	}
 
+	template<>
 	BoolParam::ValueTypedParam(const bool value, THE_4_HANDLERS_PROTO)
 		: Param(name, comment, owner, init),
 		on_modify_f_(on_modify_f ? on_modify_f : BoolParam_ParamOnModifyFunction),
@@ -474,14 +492,17 @@ namespace parameters {
 		type_ = BOOL_PARAM;
 	}
 
+	template<>
 	BoolParam::operator bool() const {
 		return value();
 	}
 
+	template<>
 	void BoolParam::operator=(const bool value) {
 		set_value(value, ParamUtils::get_current_application_default_param_source_type(), nullptr);
 	}
 
+	template<>
 	void BoolParam::set_value(const char *v, ParamSetBySourceType source_type, ParamPtr source) {
 		unsigned int pos = 0;
 		std::string vs(v);
@@ -534,6 +555,7 @@ namespace parameters {
 	// When no source vector is specified, or when the source vector does not specify this
 	// particular parameter, then our value is reset to the default value which was
 	// specified earlier in our constructor.
+	template<>
 	void BoolParam::ResetToDefault(const ParamsVectorSet *source_vec, ParamSetBySourceType source_type) {
 		if (source_vec != nullptr) {
 			BoolParam *source = source_vec->find<BoolParam>(name_str());
@@ -545,12 +567,14 @@ namespace parameters {
 		set_value(default_, PARAM_VALUE_IS_RESET, nullptr);
 	}
 
+	template<>
 	std::string BoolParam::value_str(ValueFetchPurpose purpose) const {
 		if (purpose == VALSTR_PURPOSE_DATA_4_USE)
 			safe_inc(access_counts_.reading);
 		return on_format_f_(*this, value_, default_, purpose);
 	}
 
+	template<>
 	BoolParam::ParamOnModifyFunction BoolParam::set_on_modify_handler(BoolParam::ParamOnModifyFunction on_modify_f) {
 		BoolParam::ParamOnModifyFunction rv = on_modify_f_;
 		if (!on_modify_f)
@@ -558,9 +582,11 @@ namespace parameters {
 		on_modify_f_ = on_modify_f;
 		return rv;
 	}
+	template<>
 	void BoolParam::clear_on_modify_handler() {
 		on_modify_f_ = BoolParam_ParamOnModifyFunction;
 	}
+	template<>
 	BoolParam::ParamOnValidateFunction BoolParam::set_on_validate_handler(BoolParam::ParamOnValidateFunction on_validate_f) {
 		BoolParam::ParamOnValidateFunction rv = on_validate_f_;
 		if (!on_validate_f)
@@ -568,9 +594,11 @@ namespace parameters {
 		on_validate_f_ = on_validate_f;
 		return rv;
 	}
+	template<>
 	void BoolParam::clear_on_validate_handler() {
 		on_validate_f_ = BoolParam_ParamOnValidateFunction;
 	}
+	template<>
 	BoolParam::ParamOnParseFunction BoolParam::set_on_parse_handler(BoolParam::ParamOnParseFunction on_parse_f) {
 		BoolParam::ParamOnParseFunction rv = on_parse_f_;
 		if (!on_parse_f)
@@ -578,9 +606,11 @@ namespace parameters {
 		on_parse_f_ = on_parse_f;
 		return rv;
 	}
+	template<>
 	void BoolParam::clear_on_parse_handler() {
 		on_parse_f_ = BoolParam_ParamOnParseFunction;
 	}
+	template<>
 	BoolParam::ParamOnFormatFunction BoolParam::set_on_format_handler(BoolParam::ParamOnFormatFunction on_format_f) {
 		BoolParam::ParamOnFormatFunction rv = on_format_f_;
 		if (!on_format_f)
@@ -588,11 +618,13 @@ namespace parameters {
 		on_format_f_ = on_format_f;
 		return rv;
 	}
+	template<>
 	void BoolParam::clear_on_format_handler() {
 		on_format_f_ = BoolParam_ParamOnFormatFunction;
 	}
 
 #if 0
+	template<>
 	bool BoolParam::set_value(bool v, ParamSetBySourceType source_type, ParamPtr source) {
 		bool val = (v != 0);
 		return set_value(val, source_type, source);
@@ -616,6 +648,7 @@ namespace parameters {
 			&& epsilon_plus() >= b;
 	}
 
+	template<>
 	bool BoolParam::set_value(double v, ParamSetBySourceType source_type, ParamPtr source) {
 		bool zero = is_zero(v);
 
@@ -768,6 +801,7 @@ namespace parameters {
 		}
 	}
 
+	template<>
 	DoubleParam::ValueTypedParam(const double value, THE_4_HANDLERS_PROTO)
 		: Param(name, comment, owner, init),
 		on_modify_f_(on_modify_f ? on_modify_f : DoubleParam_ParamOnModifyFunction),
@@ -779,14 +813,17 @@ namespace parameters {
 		type_ = DOUBLE_PARAM;
 	}
 
+	template<>
 	DoubleParam::operator double() const {
 		return value();
 	}
 
+	template<>
 	void DoubleParam::operator=(const double value) {
 		set_value(value, ParamUtils::get_current_application_default_param_source_type(), nullptr);
 	}
 
+	template<>
 	void DoubleParam::set_value(const char *v, ParamSetBySourceType source_type, ParamPtr source) {
 		unsigned int pos = 0;
 		std::string vs(v);
@@ -839,6 +876,7 @@ namespace parameters {
 	// When no source vector is specified, or when the source vector does not specify this
 	// particular parameter, then our value is reset to the default value which was
 	// specified earlier in our constructor.
+	template<>
 	void DoubleParam::ResetToDefault(const ParamsVectorSet *source_vec, ParamSetBySourceType source_type) {
 		if (source_vec != nullptr) {
 			DoubleParam *source = source_vec->find<DoubleParam>(name_str());
@@ -850,12 +888,14 @@ namespace parameters {
 		set_value(default_, PARAM_VALUE_IS_RESET, nullptr);
 	}
 
+	template<>
 	std::string DoubleParam::value_str(ValueFetchPurpose purpose) const {
 		if (purpose == VALSTR_PURPOSE_DATA_4_USE)
 			safe_inc(access_counts_.reading);
 		return on_format_f_(*this, value_, default_, purpose);
 	}
 
+	template<>
 	DoubleParam::ParamOnModifyFunction DoubleParam::set_on_modify_handler(DoubleParam::ParamOnModifyFunction on_modify_f) {
 		DoubleParam::ParamOnModifyFunction rv = on_modify_f_;
 		if (!on_modify_f)
@@ -863,9 +903,11 @@ namespace parameters {
 		on_modify_f_ = on_modify_f;
 		return rv;
 	}
+	template<>
 	void DoubleParam::clear_on_modify_handler() {
 		on_modify_f_ = DoubleParam_ParamOnModifyFunction;
 	}
+	template<>
 	DoubleParam::ParamOnValidateFunction DoubleParam::set_on_validate_handler(DoubleParam::ParamOnValidateFunction on_validate_f) {
 		DoubleParam::ParamOnValidateFunction rv = on_validate_f_;
 		if (!on_validate_f)
@@ -873,9 +915,11 @@ namespace parameters {
 		on_validate_f_ = on_validate_f;
 		return rv;
 	}
+	template<>
 	void DoubleParam::clear_on_validate_handler() {
 		on_validate_f_ = DoubleParam_ParamOnValidateFunction;
 	}
+	template<>
 	DoubleParam::ParamOnParseFunction DoubleParam::set_on_parse_handler(DoubleParam::ParamOnParseFunction on_parse_f) {
 		DoubleParam::ParamOnParseFunction rv = on_parse_f_;
 		if (!on_parse_f)
@@ -883,9 +927,11 @@ namespace parameters {
 		on_parse_f_ = on_parse_f;
 		return rv;
 	}
+	template<>
 	void DoubleParam::clear_on_parse_handler() {
 		on_parse_f_ = DoubleParam_ParamOnParseFunction;
 	}
+	template<>
 	DoubleParam::ParamOnFormatFunction DoubleParam::set_on_format_handler(DoubleParam::ParamOnFormatFunction on_format_f) {
 		DoubleParam::ParamOnFormatFunction rv = on_format_f_;
 		if (!on_format_f)
@@ -893,6 +939,7 @@ namespace parameters {
 		on_format_f_ = on_format_f;
 		return rv;
 	}
+	template<>
 	void DoubleParam::clear_on_format_handler() {
 		on_format_f_ = DoubleParam_ParamOnFormatFunction;
 	}
@@ -952,6 +999,7 @@ namespace parameters {
 		}
 	}
 
+	template<>
 	StringParam::StringTypedParam(const std::string &value, THE_4_HANDLERS_PROTO)
 		: Param(name, comment, owner, init),
 		on_modify_f_(on_modify_f ? on_modify_f : StringParam_ParamOnModifyFunction),
@@ -963,26 +1011,32 @@ namespace parameters {
 		type_ = STRING_PARAM;
 	}
 
+	template<>
 	StringParam::StringTypedParam(const std::string *value, THE_4_HANDLERS_PROTO)
 		: StringTypedParam(value == nullptr ? "" : *value, name, comment, owner, init, on_modify_f, on_validate_f, on_parse_f, on_format_f)
 	{}
 
+	template<>
 	StringParam::StringTypedParam(const char *value, THE_4_HANDLERS_PROTO)
 		: StringTypedParam(std::string(value == nullptr ? "" : value), name, comment, owner, init, on_modify_f, on_validate_f, on_parse_f, on_format_f)
 	{}
 
+	template<>
 	StringParam::operator const std::string &() const {
 		return value();
 	}
 
+	template<>
 	StringParam::operator const std::string *() const {
 		return &value();
 	}
 
+	template<>
 	const char* StringParam::c_str() const {
 		return value().c_str();
 	}
 
+	template<>
 	bool StringParam::empty() const noexcept {
 		return value().empty();
 	}
@@ -990,32 +1044,38 @@ namespace parameters {
 	// https://en.cppreference.com/w/cpp/feature_test#cpp_lib_string_contains
 #if defined(__has_cpp_attribute) && __has_cpp_attribute(__cpp_lib_string_contains)  // C++23
 
+	template<>
 	bool StringParam::contains(char ch) const noexcept {
 		return value().contains(ch);
 	}
 
+	template<>
 	bool StringParam::contains(const char *s) const noexcept {
 		return value().contains(s);
 	}
 
+	template<>
 	bool StringParam::contains(const std::string &s) const noexcept {
 		return value().contains(s);
 	}
 
 #else
 
+	template<>
 	bool StringParam::contains(char ch) const noexcept {
 		auto v = value();
 		auto f = v.find(ch);
 		return f != std::string::npos;
 	}
 
+	template<>
 	bool StringParam::contains(const char *s) const noexcept {
 		auto v = value();
 		auto f = v.find(s);
 		return f != std::string::npos;
 	}
 
+	template<>
 	bool StringParam::contains(const std::string &s) const noexcept {
 		auto v = value();
 		auto f = v.find(s);
@@ -1024,14 +1084,17 @@ namespace parameters {
 
 #endif
 
+	template<>
 	void StringParam::operator=(const std::string &value) {
 		set_value(value, ParamUtils::get_current_application_default_param_source_type(), nullptr);
 	}
 
+	template<>
 	void StringParam::operator=(const std::string *value) {
 		set_value((value == nullptr ? "" : *value), ParamUtils::get_current_application_default_param_source_type(), nullptr);
 	}
 
+	template<>
 	void StringParam::set_value(const char *v, ParamSetBySourceType source_type, ParamPtr source) {
 		unsigned int pos = 0;
 		std::string vs(v == nullptr ? "" : v);
@@ -1085,6 +1148,7 @@ namespace parameters {
 	// When no source vector is specified, or when the source vector does not specify this
 	// particular parameter, then our value is reset to the default value which was
 	// specified earlier in our constructor.
+	template<>
 	void StringParam::ResetToDefault(const ParamsVectorSet *source_vec, ParamSetBySourceType source_type) {
 		if (source_vec != nullptr) {
 			StringParam *source = source_vec->find<StringParam>(name_str());
@@ -1096,12 +1160,14 @@ namespace parameters {
 		set_value(default_, PARAM_VALUE_IS_RESET, nullptr);
 	}
 
+	template<>
 	std::string StringParam::value_str(ValueFetchPurpose purpose) const {
 		if (purpose == VALSTR_PURPOSE_DATA_4_USE)
 			safe_inc(access_counts_.reading);
 		return on_format_f_(*this, value_, default_, purpose);
 	}
 
+	template<>
 	StringParam::ParamOnModifyFunction StringParam::set_on_modify_handler(StringParam::ParamOnModifyFunction on_modify_f) {
 		StringParam::ParamOnModifyFunction rv = on_modify_f_;
 		if (!on_modify_f)
@@ -1109,9 +1175,11 @@ namespace parameters {
 		on_modify_f_ = on_modify_f;
 		return rv;
 	}
+	template<>
 	void StringParam::clear_on_modify_handler() {
 		on_modify_f_ = StringParam_ParamOnModifyFunction;
 	}
+	template<>
 	StringParam::ParamOnValidateFunction StringParam::set_on_validate_handler(StringParam::ParamOnValidateFunction on_validate_f) {
 		StringParam::ParamOnValidateFunction rv = on_validate_f_;
 		if (!on_validate_f)
@@ -1119,9 +1187,11 @@ namespace parameters {
 		on_validate_f_ = on_validate_f;
 		return rv;
 	}
+	template<>
 	void StringParam::clear_on_validate_handler() {
 		on_validate_f_ = StringParam_ParamOnValidateFunction;
 	}
+	template<>
 	StringParam::ParamOnParseFunction StringParam::set_on_parse_handler(StringParam::ParamOnParseFunction on_parse_f) {
 		StringParam::ParamOnParseFunction rv = on_parse_f_;
 		if (!on_parse_f)
@@ -1129,9 +1199,11 @@ namespace parameters {
 		on_parse_f_ = on_parse_f;
 		return rv;
 	}
+	template<>
 	void StringParam::clear_on_parse_handler() {
 		on_parse_f_ = StringParam_ParamOnParseFunction;
 	}
+	template<>
 	StringParam::ParamOnFormatFunction StringParam::set_on_format_handler(StringParam::ParamOnFormatFunction on_format_f) {
 		StringParam::ParamOnFormatFunction rv = on_format_f_;
 		if (!on_format_f)
@@ -1139,6 +1211,7 @@ namespace parameters {
 		on_format_f_ = on_format_f;
 		return rv;
 	}
+	template<>
 	void StringParam::clear_on_format_handler() {
 		on_format_f_ = StringParam_ParamOnFormatFunction;
 	}

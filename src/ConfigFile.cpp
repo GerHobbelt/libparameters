@@ -143,16 +143,22 @@ namespace parameters {
 			line.EOF_reached = true;
 		} else {
 			for (;;) {
-				char *s = _buffer.data();
-				size_t offset = strcspn(s, "\r\n");
-				// did we hit an empty line?
+				_lineno += _buffer.TrimLeftCountingNewlines();
+
+				// did we hit the end of the buffer?
 				if (_buffer.empty()) {
 					line.EOF_reached = true;
 					break;
 				}
 
+				char *s = _buffer.data();
+				size_t offset = strcspn(s, "\r\n");
+
 				_lineno++;
+				line.linenumber = _lineno;
+
 				char *e = s + offset;
+				// count the pack of consecutive newlines and skip 'em on the next round through here.
 				unsigned int lf_count = 0;
 				while (*e && isspace(*e)) {
 					if (*e == '\n')
@@ -162,24 +168,38 @@ namespace parameters {
 				if (lf_count > 1)
 					_lineno += lf_count - 1;
 
+				// skip embedded NUL bytes, if there are any:
+				char *stop = s + _buffer.datasize();
+				while (!*e && stop > e)
+					e++;
+
+				// this is the amount we need to jump over for our next round through here to be properly positioned after the newline series above.
+				//
+				// either way, this shift will jump over the NUL sentinel we're about to inject just below.
 				size_t shift = (e - s);
 
-				// did we NOT hit a comment line?
+				s[offset] = 0;
+
+				// did we NOT hit a comment line? Nor an empty line?
 				if (!_buffer.startsWithAny("#;") && !_buffer.startsWith("//")) {
+					// trim trailing whitespace at the tail end of the line.
 					e = s + offset;
 					e--;
 					while (e >= s && isspace(*e))
 						e--;
 					e++;
-					//*e = 0;
-					while (s < e && isspace(*s))
-						s++;
-					line.content.assign(s, e);
-					_buffer.shift_start(shift);
+					*e = 0;
+					// leading whitespace has already been trimmed at the start of the loop, so we're golden now to check for an empty line.
+					if (*s) {
+						// yay! Got a real live one: feed it to the caller!
+						line.content = std::string_view(s, e - s);
 
-					// early notification about EOF:
-					line.EOF_reached = _buffer.empty();
-					break;
+						_buffer.shift_start(shift);
+
+						// early notification about EOF:
+						line.EOF_reached = _buffer.empty();
+						break;
+					}
 				}
 				_buffer.shift_start(shift);
 			}

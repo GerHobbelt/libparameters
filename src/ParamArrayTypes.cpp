@@ -179,6 +179,8 @@ namespace parameters {
 		}
 	}
 
+
+	template<>
 	StringSetParam::BasicVectorTypedParam(const std::vector<std::string> &value, const BasicVectorParamParseAssistant &assistant, THE_4_HANDLERS_PROTO)
 		: Param(name, comment, owner, init),
 		on_modify_f_(on_modify_f ? on_modify_f : StringSetParam_ParamOnModifyFunction),
@@ -191,6 +193,7 @@ namespace parameters {
 		type_ = STRING_SET_PARAM;
 	}
 
+	template<>
 	StringSetParam::BasicVectorTypedParam(const char *value, const BasicVectorParamParseAssistant &assistant, THE_4_HANDLERS_PROTO)
 		: BasicVectorTypedParam(std::vector<std::string>(), assistant, name, comment, owner, init, on_modify_f, on_validate_f, on_parse_f, on_format_f)
 	{
@@ -206,26 +209,32 @@ namespace parameters {
 		}
 	}
 
+	template<>
 	StringSetParam::operator const std::vector<std::string> &() const {
 		return value();
 	}
 
+	template<>
 	StringSetParam::operator const std::vector<std::string> *() const {
 		return &value();
 	}
 
+	template<>
 	const char *StringSetParam::c_str() const {
 		return value_str(VALSTR_PURPOSE_DATA_4_USE).c_str();
 	}
 
+	template<>
 	bool StringSetParam::empty() const noexcept {
 		return value().empty();
 	}
 
+	template<>
 	void StringSetParam::operator=(const std::vector<std::string> &value) {
 		set_value(value, ParamUtils::get_current_application_default_param_source_type(), nullptr);
 	}
 
+	template<>
 	void StringSetParam::set_value(const char *v, ParamSetBySourceType source_type, ParamPtr source) {
 		unsigned int pos = 0;
 		std::string vs(v == nullptr ? "" : v);
@@ -297,6 +306,7 @@ namespace parameters {
 		return on_format_f_(*this, value_, default_, purpose);
 	}
 
+	template<>
 	StringSetParam::ParamOnModifyFunction StringSetParam::set_on_modify_handler(StringSetParam::ParamOnModifyFunction on_modify_f) {
 		StringSetParam::ParamOnModifyFunction rv = on_modify_f_;
 		if (!on_modify_f)
@@ -304,9 +314,11 @@ namespace parameters {
 		on_modify_f_ = on_modify_f;
 		return rv;
 	}
+	template<>
 	void StringSetParam::clear_on_modify_handler() {
 		on_modify_f_ = StringSetParam_ParamOnModifyFunction;
 	}
+	template<>
 	StringSetParam::ParamOnValidateFunction StringSetParam::set_on_validate_handler(StringSetParam::ParamOnValidateFunction on_validate_f) {
 		StringSetParam::ParamOnValidateFunction rv = on_validate_f_;
 		if (!on_validate_f)
@@ -314,9 +326,11 @@ namespace parameters {
 		on_validate_f_ = on_validate_f;
 		return rv;
 	}
+	template<>
 	void StringSetParam::clear_on_validate_handler() {
 		on_validate_f_ = StringSetParam_ParamOnValidateFunction;
 	}
+	template<>
 	StringSetParam::ParamOnParseFunction StringSetParam::set_on_parse_handler(StringSetParam::ParamOnParseFunction on_parse_f) {
 		StringSetParam::ParamOnParseFunction rv = on_parse_f_;
 		if (!on_parse_f)
@@ -324,9 +338,11 @@ namespace parameters {
 		on_parse_f_ = on_parse_f;
 		return rv;
 	}
+	template<>
 	void StringSetParam::clear_on_parse_handler() {
 		on_parse_f_ = StringSetParam_ParamOnParseFunction;
 	}
+	template<>
 	StringSetParam::ParamOnFormatFunction StringSetParam::set_on_format_handler(StringSetParam::ParamOnFormatFunction on_format_f) {
 		StringSetParam::ParamOnFormatFunction rv = on_format_f_;
 		if (!on_format_f)
@@ -334,6 +350,7 @@ namespace parameters {
 		on_format_f_ = on_format_f;
 		return rv;
 	}
+	template<>
 	void StringSetParam::clear_on_format_handler() {
 		on_format_f_ = StringSetParam_ParamOnFormatFunction;
 	}
@@ -590,6 +607,7 @@ namespace parameters {
 		}
 	}
 
+	template<>
 	IntSetParam::BasicVectorTypedParam(const std::vector<int32_t> &value, const BasicVectorParamParseAssistant &assistant, THE_4_HANDLERS_PROTO)
 		: Param(name, comment, owner, init),
 		on_modify_f_(on_modify_f ? on_modify_f : IntSetParam_ParamOnModifyFunction),
@@ -602,6 +620,7 @@ namespace parameters {
 		type_ = STRING_SET_PARAM;
 	}
 
+	template<>
 	IntSetParam::BasicVectorTypedParam(const char *value, const BasicVectorParamParseAssistant &assistant, THE_4_HANDLERS_PROTO)
 		: BasicVectorTypedParam(std::vector<int32_t>(), assistant, name, comment, owner, init, on_modify_f, on_validate_f, on_parse_f, on_format_f) {
 		unsigned int pos = 0;
@@ -616,26 +635,32 @@ namespace parameters {
 		}
 	}
 
+	template<>
 	IntSetParam::operator const std::vector<int32_t> &() const {
 		return value();
 	}
 
+	template<>
 	IntSetParam::operator const std::vector<int32_t> *() const {
 		return &value();
 	}
 
+	template<>
 	const char *IntSetParam::c_str() const {
 		return value_str(VALSTR_PURPOSE_DATA_4_USE).c_str();
 	}
 
+	template<>
 	bool IntSetParam::empty() const noexcept {
 		return value().empty();
 	}
 
+	template<>
 	void IntSetParam::operator=(const std::vector<int32_t> &value) {
 		set_value(value, ParamUtils::get_current_application_default_param_source_type(), nullptr);
 	}
 
+	template<>
 	void IntSetParam::set_value(const char *v, ParamSetBySourceType source_type, ParamPtr source) {
 		unsigned int pos = 0;
 		std::string vs(v == nullptr ? "" : v);
@@ -689,6 +714,7 @@ namespace parameters {
 	// When no source vector is specified, or when the source vector does not specify this
 	// particular parameter, then our value is reset to the default value which was
 	// specified earlier in our constructor.
+	template<>
 	void IntSetParam::ResetToDefault(const ParamsVectorSet *source_vec, ParamSetBySourceType source_type) {
 		if (source_vec != nullptr) {
 			IntSetParam *source = source_vec->find<IntSetParam>(name_str());
@@ -707,6 +733,7 @@ namespace parameters {
 		return on_format_f_(*this, value_, default_, purpose);
 	}
 
+	template<>
 	IntSetParam::ParamOnModifyFunction IntSetParam::set_on_modify_handler(IntSetParam::ParamOnModifyFunction on_modify_f) {
 		IntSetParam::ParamOnModifyFunction rv = on_modify_f_;
 		if (!on_modify_f)
@@ -714,9 +741,11 @@ namespace parameters {
 		on_modify_f_ = on_modify_f;
 		return rv;
 	}
+	template<>
 	void IntSetParam::clear_on_modify_handler() {
 		on_modify_f_ = IntSetParam_ParamOnModifyFunction;
 	}
+	template<>
 	IntSetParam::ParamOnValidateFunction IntSetParam::set_on_validate_handler(IntSetParam::ParamOnValidateFunction on_validate_f) {
 		IntSetParam::ParamOnValidateFunction rv = on_validate_f_;
 		if (!on_validate_f)
@@ -724,9 +753,11 @@ namespace parameters {
 		on_validate_f_ = on_validate_f;
 		return rv;
 	}
+	template<>
 	void IntSetParam::clear_on_validate_handler() {
 		on_validate_f_ = IntSetParam_ParamOnValidateFunction;
 	}
+	template<>
 	IntSetParam::ParamOnParseFunction IntSetParam::set_on_parse_handler(IntSetParam::ParamOnParseFunction on_parse_f) {
 		IntSetParam::ParamOnParseFunction rv = on_parse_f_;
 		if (!on_parse_f)
@@ -734,9 +765,11 @@ namespace parameters {
 		on_parse_f_ = on_parse_f;
 		return rv;
 	}
+	template<>
 	void IntSetParam::clear_on_parse_handler() {
 		on_parse_f_ = IntSetParam_ParamOnParseFunction;
 	}
+	template<>
 	IntSetParam::ParamOnFormatFunction IntSetParam::set_on_format_handler(IntSetParam::ParamOnFormatFunction on_format_f) {
 		IntSetParam::ParamOnFormatFunction rv = on_format_f_;
 		if (!on_format_f)
@@ -744,6 +777,7 @@ namespace parameters {
 		on_format_f_ = on_format_f;
 		return rv;
 	}
+	template<>
 	void IntSetParam::clear_on_format_handler() {
 		on_format_f_ = IntSetParam_ParamOnFormatFunction;
 	}
