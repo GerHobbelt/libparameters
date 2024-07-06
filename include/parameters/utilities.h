@@ -144,7 +144,7 @@ namespace parameters {
 		// which may be stdout/stderr.
 		//
 		// When `set` is empty, the `GlobalParams()` vector will be assumed instead.
-		static void ReportParamsUsageStatistics(ReportWriter &dst, const ParamsVectorSet &set, bool report_unused_params = false, ReportWriter::ParamInfoElement show_elements_style = ReportWriter::PARAMINFO_EXPLANATORY_STATUSREPORT_LINE, const char *section_title = nullptr);
+		static void ReportParamsUsageStatistics(ReportWriter &dst, const ParamsVectorSet &set, int section_level, bool report_unused_params = false, ReportWriter::ParamInfoElement show_elements_style = ReportWriter::PARAMINFO_EXPLANATORY_STATUSREPORT_LINE, const char *section_title = nullptr);
 
 		// --------------------------------------------------------------------------------------------------
 

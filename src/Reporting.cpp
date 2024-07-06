@@ -126,11 +126,15 @@ namespace parameters {
 	// which may be stdout/stderr.
 	//
 	// When `set` is empty, the `GlobalParams()` vector will be assumed instead.
-	void ParamUtils::ReportParamsUsageStatistics(ReportWriter &dst, const ParamsVectorSet &set, bool report_unused_params, ReportWriter::ParamInfoElement show_elements_style, const char *section_title) {
+	void ParamUtils::ReportParamsUsageStatistics(ReportWriter &dst, const ParamsVectorSet &set, int section_level, bool report_unused_params, ReportWriter::ParamInfoElement show_elements_style, const char *section_title) {
 		if (!section_title || !*section_title)
 			section_title = ParamUtils::GetApplicationName().c_str();
 
-		dst.WriteHeaderLine(fmt::format("{}: Parameter Usage Statistics: which params have been relevant?", section_title), 1);
+		dst.WriteHeaderLine(fmt::format("{}: Parameter Usage Statistics: which params have been relevant?", section_title), std::max(1, section_level + 1));
+
+		writer.Write("\n\n"
+			"(WR legenda: `.`: zero/nil; `w`: written once, `W`: ~ twice or more; `r` = read once, `R`: ~ twice or more)\n"
+			"\n\n");
 
 		// first collect all parameters and sort them:
 		for (ParamsVector *vec : set.get()) {
@@ -241,6 +245,9 @@ namespace parameters {
 
 
 
+
+
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// ParamsReportWriter, et al
@@ -283,6 +290,23 @@ namespace parameters {
 	};
 
 
+	class ParamsReportStringWriter: public ParamsReportWriter {
+	public:
+		ParamsReportStringWriter(): ParamsReportWriter(nullptr) {}
+		virtual ~ParamsReportStringWriter() = default;
+
+		virtual void Write(const std::string message) {
+			buffer += message;
+		}
+
+		std::string to_string() const {
+			return buffer;
+		}
+
+	protected:
+		std::string buffer;
+	};
+
 
 
 
@@ -298,7 +322,7 @@ namespace parameters {
 	// When `section_title` is NULL, this will report the lump sum parameter usage for the entire run.
 	// When `section_title` is NOT NULL, this will only report the parameters that were actually used (R/W) during the last section of the run, i.e.
 	// since the previous invocation of this reporting method (or when it hasn't been called before: the start of the application).
-	void ParamUtils::ReportParamsUsageStatistics(FILE *f, const ParamsVectorSet *member_params, const char *section_title)
+	void ParamUtils::ReportParamsUsageStatistics(FILE *f, const ParamsVectorSet *member_params, int section_level, const char *section_title)
 	{
 		bool is_section_subreport = (section_title != nullptr);
 
@@ -310,7 +334,7 @@ namespace parameters {
 			writer.reset(new ParamsReportDefaultWriter());
 		}
 
-		writer->Write(fmt::format("\n\n{} Parameter Usage Statistics{}: which params have been relevant?\n"
+		writer->Write(fmt::format("\n\n{} {} Parameter Usage Statistics{}: which params have been relevant?\n"
 			"----------------------------------------------------------------------\n\n",
 			ParamUtils::GetApplicationName(), (section_title != nullptr ? fmt::format(" for section: {}", section_title) : "")));
 
