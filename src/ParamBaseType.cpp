@@ -14,10 +14,18 @@ namespace parameters {
 	//
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	static const char *safe_strdup(const char *str) {
+		const char *rv = strdup(str ? str : "");
+		if (!rv) {
+			throw std::bad_alloc();
+		}
+		return rv;
+	}
+
 	Param::Param(const char *name, const char *comment, ParamsVector &owner, bool init)
 		: owner_(owner),
-		name_(name),
-		info_(comment),
+		name_(nullptr),
+		info_(nullptr),
 		init_(init),
 		// debug_(false),
 		set_(false),
@@ -33,6 +41,16 @@ namespace parameters {
 		debug_ = (strstr(name, "debug") != nullptr) || (strstr(name, "display") != nullptr);
 
 		owner.add(this);
+
+		name_ = safe_strdup(name);
+		info_ = safe_strdup(comment);
+	}
+
+	Param::~Param() {
+		if (info_)
+			free((void *)info_);
+		if (name_)
+			free((void *)name_);
 	}
 
 	const char *Param::name_str() const noexcept {
@@ -88,13 +106,10 @@ namespace parameters {
 	}
 
 	void Param::reset_access_counts() noexcept {
-		safe_add(access_counts_.prev_sum_reading, access_counts_.reading);
-		safe_add(access_counts_.prev_sum_writing, access_counts_.writing);
-		safe_add(access_counts_.prev_sum_changing, access_counts_.changing);
-
 		access_counts_.reading = 0;
 		access_counts_.writing = 0;
 		access_counts_.changing = 0;
+		access_counts_.faulting = 0;
 	}
 
 	std::string Param::formatted_value_str() const {

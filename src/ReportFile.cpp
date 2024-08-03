@@ -199,6 +199,13 @@ namespace parameters {
 		_postprocessor(_buffer, start_pos, _type, PARAMREPORT_INFO_PARAGRAPH, _active_level, nullptr);
 	}
 
+	void ReportWriter::WriteOther(LineContentPurpose purpose, const std::string &message) {
+		size_t start_pos = _buffer.get_current_shift();
+		_buffer.append(message);
+
+		_postprocessor(_buffer, start_pos, _type, purpose, _active_level, nullptr);
+	}
+
 	void ReportWriter::WriteLineBuffer() {
 		// nada. zilch.
 	}

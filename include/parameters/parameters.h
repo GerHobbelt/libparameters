@@ -9,6 +9,7 @@
 
 #include <parameters/parameter_classes.h>
 #include <parameters/parameter_sets.h>
+#include <parameters/parameter_snapshots.h>
 #include <parameters/utilities.h>
 #include <parameters/configreader.h>
 #include <parameters/reportwriter.h>

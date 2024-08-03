@@ -17,6 +17,8 @@
 
 namespace parameters {
 
+	class Snapshot;
+
 	// Custom equivalent of std::hash<Param> + std::equal_to<Param> for std::unordered_map<const char *key, Param & value>.
 	class ParamHash
 	{
@@ -118,6 +120,7 @@ namespace parameters {
 		) const;
 
 		friend class ParamsVectorSet;
+		friend class Snapshot;
 	};
 
 	// --------------------------------------------------------------------------------------------------
@@ -157,6 +160,7 @@ namespace parameters {
 
 	public:
 		friend class ParamsVectorSet;
+		friend class Snapshot;
 	};
 
 	// --------------------------------------------------------------------------------------------------
@@ -195,6 +199,9 @@ namespace parameters {
 		) const;
 
 		ParamsVector flattened_copy(ParamType accepted_types_mask = ANY_TYPE_PARAM) const;
+
+	public:
+		friend class Snapshot;
 	};
 
 	// --------------------------------------------------------------------------------------------------

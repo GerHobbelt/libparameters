@@ -41,6 +41,8 @@ namespace parameters {
 			PARAMREPORT_INFO_PARAGRAPH,
 			PARAMREPORT_PARAM_ACTIVITY_ANALYSIS,
 			PARAMREPORT_PARAM_DECLARATION,
+			PARAMREPORT_TABLE_LEGENDA,
+			PARAMREPORT_ITEM_LIST,
 		};
 
 		// userdef function proto: may pass or rewrite the line_buffer, depending on target, purpose or other extraneous userland reasons.
@@ -72,8 +74,12 @@ namespace parameters {
 		};
 
 		void WriteParamInfoLine(const Param &param, ParamInfoElement show_elements);
+		void WriteParamInfoLine(const Param *param, ParamInfoElement show_elements) {
+			WriteParamInfoLine(*param, show_elements);
+		}
 		void WriteHeaderLine(const std::string &message, int level /* starts at level 1 */);
 		void WriteInfoParagraph(const std::string &message);
+		void WriteOther(LineContentPurpose purpose, const std::string &message);
 
 	protected:
 		virtual void WriteLineBuffer();

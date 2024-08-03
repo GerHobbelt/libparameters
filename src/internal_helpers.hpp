@@ -17,7 +17,6 @@ namespace parameters {
 	// -- local helper functions --
 
 	using statistics_uint_t = decltype(Param::access_counts_t().reading);
-	using statistics_lumpsum_uint_t = decltype(Param::access_counts_t().prev_sum_reading);
 
 	// increment value, prevent overflow, a.k.a. wrap-around, i.e. clip to maximum value
 	template <class T, typename = std::enable_if_t<std::is_unsigned<T>::value>>

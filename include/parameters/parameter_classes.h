@@ -56,6 +56,7 @@ namespace parameters {
 		PARAM_VALUE_IS_SET_BY_PARAM,          // 'indirect' write: other Param's OnChange code set the param value, whatever it is now.
 		PARAM_VALUE_IS_SET_BY_APPLICATION,    // 'explicit' write: user / application code set the param value, whatever it is now.
 		PARAM_VALUE_IS_SET_BY_CORE_RUN,       // 'explicit' write by the running application core: before proceding with the next step the run-time adjusts this one, e.g. (incrementing) page number while processing a multi-page OCR run.
+		PARAM_VALUE_IS_SET_BY_SNAPSHOT_REWIND, // 'explicit' write: parameter snapshot was rewound to a given snapshot/value.
 	};
 	DECL_FMT_FORMAT_PARAMENUMTYPE(ParamSetBySourceType);
 
@@ -193,7 +194,7 @@ namespace parameters {
 		Param(const char *name, const char *comment, ParamsVector &owner, bool init = false);
 
 	public:
-		virtual ~Param() = default;
+		virtual ~Param();
 
 		const char *name_str() const noexcept;
 		const char *info_str() const noexcept;
@@ -239,13 +240,7 @@ namespace parameters {
 			uint16_t reading;
 			uint16_t writing;   // counting the number of *write* actions, answering the question "did we assign a value to this one during this run?"
 			uint16_t changing;  // counting the number of times a *write* action resulted in an actual *value change*, answering the question "did we use a non-default value for this one during this run?"
-			uint16_t faulting;
-
-			// the sum of the previous section's counts: the collected history from previous runs during this application life time.
-			uint16_t prev_sum_reading;
-			uint16_t prev_sum_writing;
-			uint16_t prev_sum_changing;
-			uint16_t prev_sum_faulting;
+			uint16_t faulting;  // counting the number of times a *parse* action produced a *fault* instead of a legal value to be written into the parameter.
 		} access_counts_t;
 
 		const access_counts_t &access_counts() const noexcept;
@@ -275,7 +270,7 @@ namespace parameters {
 			// the other functions: set_value() and assignment operators.
 			VALSTR_PURPOSE_DATA_FORMATTED_4_DISPLAY,
 
-			// Fetches the (raw, parseble for re-use via set_value() or storing to serialized text data format files) value of the param as a string and DOES add
+			// Fetches the (raw, parseble for re-use via set_value() for storing to serialized text data format files) value of the param as a string and DOES add
 			// this access to the read counter tally. This is useful, f.e., when printing 'init'
 			// (only-settable-before-first-use) parameters to config file, independent
 			// from the actual work process.
