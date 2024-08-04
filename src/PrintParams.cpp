@@ -19,7 +19,7 @@ namespace parameters {
 		std::ostringstream stream;
 		stream.imbue(std::locale::classic());
 		for (int v = 0; v < num_iterations; ++v) {
-			const ParamsVectorSet *vec = (v == 0) ? GlobalParams() : member_params;
+			const ParamsVectorSet *vec = ((v == 0) ? GlobalParams() : member_params);
 			for (auto int_param : vec->int_params_c()) {
 				if (print_info) {
 					stream << int_param->name_str() << '\t' << (int32_t)(*int_param) << '\t'

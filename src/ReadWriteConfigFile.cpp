@@ -16,7 +16,7 @@ namespace parameters {
 	public:
 		// Read parameters from the given file pointer.
 		// Otherwise identical to ReadParamsFile().
-		static bool ReadParamsFromFp(TFile *fp,
+		static bool ReadParamsFromFp(FILE *fp,
 																 const ParamsVectorSet &set,
 																 ParamSetBySourceType source_type = PARAM_VALUE_IS_SET_BY_APPLICATION,
 																 ParamPtr source = nullptr);
