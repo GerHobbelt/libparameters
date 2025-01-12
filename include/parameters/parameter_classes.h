@@ -46,7 +46,7 @@ namespace parameters {
 
 	// Identifiers used to indicate the *origin* of the current parameter value. Used for reporting/diagnostic purposes. Do not treat these
 	// as gospel; these are often assigned under limited/reduced information conditions, so they merely serve as report *hints*.
-	enum ParamSetBySourceType {
+	enum ParamSetBySourceType : unsigned {
 		PARAM_VALUE_IS_DEFAULT = 0,
 
 		PARAM_VALUE_IS_RESET,
