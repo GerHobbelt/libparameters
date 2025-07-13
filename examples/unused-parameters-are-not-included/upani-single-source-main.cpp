@@ -7,4 +7,15 @@
 // to include or discard in the final application.
 
 
+#include "a.cpp"
+
+#include "b.cpp"
+
+#include "c.cpp"
+
+#include "d.cpp"
+
+#define SINGLE_SOURCE_DEMO 1
+#include "upani-main.cpp"
+
 
