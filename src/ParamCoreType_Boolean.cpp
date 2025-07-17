@@ -148,30 +148,30 @@ namespace parameters {
 		pos = endptr - vs;
 	}
 
-	std::string BoolParam_ParamOnFormatFunction(const BoolParam &source, const bool value, const bool default_value, Param::ValueFetchPurpose purpose) {
+	std::string BoolParam_ParamOnFormatFunction(const BoolParam &source, const bool value, const bool default_value, ValueFetchPurpose purpose) {
 		switch (purpose) {
 			// Fetches the (raw, parseble for re-use via set_value()) value of the param as a string.
-		case Param::ValueFetchPurpose::VALSTR_PURPOSE_RAW_DATA_4_INSPECT:
+		case ValueFetchPurpose::VALSTR_PURPOSE_RAW_DATA_4_INSPECT:
 			// Fetches the (formatted for print/display) value of the param as a string.
-		case Param::ValueFetchPurpose::VALSTR_PURPOSE_DATA_FORMATTED_4_DISPLAY:
+		case ValueFetchPurpose::VALSTR_PURPOSE_DATA_FORMATTED_4_DISPLAY:
 			// Fetches the (raw, parseble for re-use via set_value() or storing to serialized text data format files) value of the param as a string.
 			//
 			// NOTE: The part where the documentation says this variant MUST update the parameter usage statistics is
 			// handled by the Param class code itself; no need for this callback to handle that part of the deal.
-		case Param::ValueFetchPurpose::VALSTR_PURPOSE_DATA_4_USE:
+		case ValueFetchPurpose::VALSTR_PURPOSE_DATA_4_USE:
 			return value ? "true" : "false";
 
 			// Fetches the (raw, parseble for re-use via set_value()) default value of the param as a string.
-		case Param::ValueFetchPurpose::VALSTR_PURPOSE_RAW_DEFAULT_DATA_4_INSPECT:
+		case ValueFetchPurpose::VALSTR_PURPOSE_RAW_DEFAULT_DATA_4_INSPECT:
 			// Fetches the (formatted for print/display) default value of the param as a string.
-		case Param::ValueFetchPurpose::VALSTR_PURPOSE_DEFAULT_DATA_FORMATTED_4_DISPLAY:
+		case ValueFetchPurpose::VALSTR_PURPOSE_DEFAULT_DATA_FORMATTED_4_DISPLAY:
 			return default_value ? "true" : "false";
 
 			// Return string representing the type of the parameter value, e.g. "integer".
-		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO_4_INSPECT:
+		case ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO_4_INSPECT:
 			return "bool";
 
-		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO_4_DISPLAY:
+		case ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO_4_DISPLAY:
 			return "boolean";
 
 		default:

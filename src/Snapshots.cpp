@@ -66,7 +66,7 @@ namespace parameters {
 					default: {
 						datum.param_ref = p;
 						datum.stats = p->access_counts();
-						datum.value = p->value_str(Param::VALSTR_PURPOSE_RAW_DEFAULT_DATA_4_INSPECT);
+						datum.value = p->value_str(VALSTR_PURPOSE_RAW_DEFAULT_DATA_4_INSPECT);
 					} break;
 					}
 				}
@@ -110,7 +110,7 @@ namespace parameters {
 					default: {
 						datum.param_ref = p;
 						datum.stats = p->access_counts();
-						datum.value = p->value_str(Param::VALSTR_PURPOSE_RAW_DATA_4_INSPECT);
+						datum.value = p->value_str(VALSTR_PURPOSE_RAW_DATA_4_INSPECT);
 					} break;
 					}
 				}

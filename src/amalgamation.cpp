@@ -21,11 +21,6 @@
 #include "./ParamCoreType_String.cpp"
 #include "./ParamCoreType_UserDefinedClass.cpp"
 
-#if 0
-#include "./ParamCustomSetTypeSample.cpp"
-#include "./ParamCustomTypeSample.cpp"
-#endif
-
 #include "./paramsAssist.cpp"
 #include "./ParamsVector.cpp"
 #include "./ParamsVectorSet.cpp"

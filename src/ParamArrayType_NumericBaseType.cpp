@@ -204,35 +204,35 @@ namespace parameters {
 		return rv;
 	}
 
-	std::string IntSetParam_ParamOnFormatFunction(const IntSetParam &source, const std::vector<int32_t> &value, const std::vector<int32_t> &default_value, Param::ValueFetchPurpose purpose) {
+	std::string IntSetParam_ParamOnFormatFunction(const IntSetParam &source, const std::vector<int32_t> &value, const std::vector<int32_t> &default_value, ValueFetchPurpose purpose) {
 		const BasicVectorParamParseAssistant &assistant = source.get_assistant();
 		switch (purpose) {
 			// Fetches the (raw, parseble for re-use via set_value()) value of the param as a string.
-		case Param::ValueFetchPurpose::VALSTR_PURPOSE_RAW_DATA_4_INSPECT:
+		case ValueFetchPurpose::VALSTR_PURPOSE_RAW_DATA_4_INSPECT:
 			// Fetches the (raw, parseble for re-use via set_value() or storing to serialized text data format files) value of the param as a string.
 			//
 			// NOTE: The part where the documentation says this variant MUST update the parameter usage statistics is
 			// handled by the Param class code itself; no need for this callback to handle that part of the deal.
-		case Param::ValueFetchPurpose::VALSTR_PURPOSE_DATA_4_USE:
+		case ValueFetchPurpose::VALSTR_PURPOSE_DATA_4_USE:
 			return fmt_stringset_vector(value, assistant.fmt_data_prefix.c_str(), assistant.fmt_data_postfix.c_str(), assistant.fmt_data_separator.c_str());
 
 			// Fetches the (formatted for print/display) value of the param as a string.
-		case Param::ValueFetchPurpose::VALSTR_PURPOSE_DATA_FORMATTED_4_DISPLAY:
+		case ValueFetchPurpose::VALSTR_PURPOSE_DATA_FORMATTED_4_DISPLAY:
 			return fmt_stringset_vector(value, assistant.fmt_display_prefix.c_str(), assistant.fmt_display_postfix.c_str(), assistant.fmt_display_separator.c_str());
 
 			// Fetches the (raw, parseble for re-use via set_value()) default value of the param as a string.
-		case Param::ValueFetchPurpose::VALSTR_PURPOSE_RAW_DEFAULT_DATA_4_INSPECT:
+		case ValueFetchPurpose::VALSTR_PURPOSE_RAW_DEFAULT_DATA_4_INSPECT:
 			return fmt_stringset_vector(default_value, assistant.fmt_data_prefix.c_str(), assistant.fmt_data_postfix.c_str(), assistant.fmt_data_separator.c_str());
 
 			// Fetches the (formatted for print/display) default value of the param as a string.
-		case Param::ValueFetchPurpose::VALSTR_PURPOSE_DEFAULT_DATA_FORMATTED_4_DISPLAY:
+		case ValueFetchPurpose::VALSTR_PURPOSE_DEFAULT_DATA_FORMATTED_4_DISPLAY:
 			return fmt_stringset_vector(default_value, assistant.fmt_display_prefix.c_str(), assistant.fmt_display_postfix.c_str(), assistant.fmt_display_separator.c_str());
 
 			// Return string representing the type of the parameter value, e.g. "integer".
-		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO_4_INSPECT:
+		case ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO_4_INSPECT:
 			return "Int32Array";
 
-		case Param::ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO_4_DISPLAY:
+		case ValueFetchPurpose::VALSTR_PURPOSE_TYPE_INFO_4_DISPLAY:
 			return "set of integers";
 
 		default:
