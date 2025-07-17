@@ -6,12 +6,6 @@
 
 namespace parameters {
 
-	ParamsVector &GlobalParams(void) {
-		static ParamsVector global_params("global"); // static auto-inits at startup
-		return global_params;
-	}
-
-
 	static ParamSetBySourceType default_source_type = PARAM_VALUE_IS_SET_BY_ASSIGN;
 
 	/**

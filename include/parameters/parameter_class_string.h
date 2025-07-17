@@ -33,9 +33,9 @@ namespace parameters {
  */
 
 	// Use this one for std::String parameters: those are kinda special...
-	template <class T>
+	template <class T, class Assistant>
 	class StringTypedParam: public Param {
-		using RTP = StringTypedParam<T>;
+		using RTP = StringTypedParam<T, Assistant>;
 
 	public:
 		using Param::Param;
@@ -64,9 +64,9 @@ namespace parameters {
 		using ParamOnFormatFunction = std::function<ParamOnFormatCFunction>;
 
 	public:
-		StringTypedParam(const char *value, THE_4_HANDLERS_PROTO);
-		StringTypedParam(const T &value, THE_4_HANDLERS_PROTO);
-		explicit StringTypedParam(const T *value, THE_4_HANDLERS_PROTO);
+		StringTypedParam(const char *value, const Assistant &assist, THE_4_HANDLERS_PROTO);
+		StringTypedParam(const T &value, const Assistant &assist, THE_4_HANDLERS_PROTO);
+		explicit StringTypedParam(const T *value, const Assistant &assist, THE_4_HANDLERS_PROTO);
 		virtual ~StringTypedParam() = default;
 
 		// operator T() const;
@@ -75,6 +75,12 @@ namespace parameters {
 		// void operator=(T value);
 		void operator=(const T &value);
 		void operator=(const T *value);
+
+		// Produce a reference to the parameter-internal assistant instance.
+		// 
+		// Used, for example, by the parse handler, to obtain info about delimiters, etc., necessary to successfully parse a string value into a T object.
+		Assistant &get_assistant();
+		const Assistant &get_assistant() const;
 
 		operator const std::string &();
 		const char *c_str() const;
@@ -149,6 +155,7 @@ namespace parameters {
 	protected:
 		T value_;
 		T default_;
+		Assistant assistant_;
 	};
 
 	// --------------------------------------------------------------------------------------------------

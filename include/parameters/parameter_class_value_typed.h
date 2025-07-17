@@ -33,9 +33,9 @@ namespace parameters {
  */
 
 	// Using this one as the base for fundamental types:
-	template <class T>
+	template <class T, class Assistant>
 	class ValueTypedParam: public Param {
-		using RTP = ValueTypedParam<T>;
+		using RTP = ValueTypedParam<T, Assistant>;
 
 	public:
 		using Param::Param;
@@ -64,12 +64,23 @@ namespace parameters {
 		using ParamOnFormatFunction = std::function<ParamOnFormatCFunction>;
 
 	public:
-		ValueTypedParam(const T value, THE_4_HANDLERS_PROTO);
+		ValueTypedParam(const char *value, const Assistant &assist, THE_4_HANDLERS_PROTO);
+		ValueTypedParam(const T value, const Assistant &assist, THE_4_HANDLERS_PROTO);
+		explicit ValueTypedParam(const T *value, const Assistant &assist, THE_4_HANDLERS_PROTO);
 		virtual ~ValueTypedParam() = default;
 
 		operator T() const;
+		operator const T&() const;
+		//operator const T *() const;
 		void operator=(const T value);
+		void operator=(const T &value);
+		//void operator=(const T *value);
 
+		// Produce a reference to the parameter-internal assistant instance.
+		// 
+		// Used, for example, by the parse handler, to obtain info about delimiters, etc., necessary to successfully parse a string value into a T object.
+		Assistant &get_assistant();
+		const Assistant &get_assistant() const;
 
 		operator const std::string &();
 		const char* c_str() const;
@@ -77,7 +88,7 @@ namespace parameters {
 		bool empty() const noexcept;
 
 		virtual void set_value(const char *v, SOURCE_REF) override;
-		void set_value(T v, SOURCE_REF);
+		void set_value(const T v, SOURCE_REF);
 
 		// the Param::set_value methods will not be considered by the compiler here, resulting in at least 1 compile error in params.cpp,
 		// due to this nasty little blurb:
@@ -140,6 +151,7 @@ namespace parameters {
 	protected:
 		T value_;
 		T default_;
+		Assistant assistant_;
 	};
 
 	// --------------------------------------------------------------------------------------------------

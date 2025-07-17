@@ -25,11 +25,11 @@ namespace parameters {
 
 	// see note above: these must be using statements, not derived classes, or otherwise the constructor/operator delete instructions in that base template won't deliver as expected!
 
-	using IntParam = ValueTypedParam<int32_t>;
-	using BoolParam = ValueTypedParam<bool>;
-	using DoubleParam = ValueTypedParam<double>;
+	using IntParam = ValueTypedParam<int32_t, BasicValueParamParseAssistant>;
+	using BoolParam = ValueTypedParam<bool, BasicValueParamParseAssistant>;
+	using DoubleParam = ValueTypedParam<double, BasicValueParamParseAssistant>;
 
-	using StringParam = StringTypedParam<std::string>;
+	using StringParam = StringTypedParam<std::string, BasicStringParamParseAssistant>;
 
 	// --------------------------------------------------------------------------------------------------
 
