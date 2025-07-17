@@ -29,14 +29,17 @@ namespace parameters {
 		BOOL_PARAM =        0x0002,
 		DOUBLE_PARAM =      0x0004,
 		STRING_PARAM =      0x0008,
-		STRING_SET_PARAM =  0x0010,
-		INT_SET_PARAM =     0x0020,
-		BOOL_SET_PARAM =    0x0040,
-		DOUBLE_SET_PARAM =  0x0080,
-		CUSTOM_PARAM =      0x0100, // a yet-unspecified type: provided as an advanced-use generic parameter value storage container for when the other, basic, value types do not suffice in userland code. The tesseract core does not employ this value type anywhere: we do have compound paramater values, mostly sets of file paths, but those are encoded as *string* value in their parameter value.
-		CUSTOM_SET_PARAM =  0x0200, // a yet-unspecified vector type.
+		CUSTOM_PARAM =      0x0010, // a yet-unspecified type: provided as an advanced-use generic parameter value storage container for when the other, basic, value types do not suffice in userland code. The tesseract core does not employ this value type anywhere: we do have compound paramater values, mostly sets of file paths, but those are encoded as *string* value in their parameter value.
 
-		ANY_TYPE_PARAM =    0x03FF, // catch-all identifier for the selection/filter functions: there this is used to match *any and all* parameter value types encountered.
+		VECTOR_PARAM =      0x0020, // any vector type.
+
+		INT_SET_PARAM =     INT_PARAM | VECTOR_PARAM,
+		BOOL_SET_PARAM =    BOOL_PARAM | VECTOR_PARAM,
+		DOUBLE_SET_PARAM =  DOUBLE_PARAM | VECTOR_PARAM,
+		STRING_SET_PARAM =  STRING_PARAM | VECTOR_PARAM,
+		CUSTOM_SET_PARAM =  CUSTOM_PARAM | VECTOR_PARAM, // a yet-unspecified vector type.
+
+		ANY_TYPE_PARAM =    0x03F, // catch-all identifier for the selection/filter functions: there this is used to match *any and all* parameter value types encountered.
 	};
 	DECL_FMT_FORMAT_PARAMENUMTYPE(ParamType);
 
@@ -50,12 +53,12 @@ namespace parameters {
 		PARAM_VALUE_IS_DEFAULT = 0,
 
 		PARAM_VALUE_IS_RESET,
-		PARAM_VALUE_IS_SET_BY_PRESET,         // 'indirect' write: a tesseract 'preset' parameter set was invoked and that one set this one as part of the action.
-		PARAM_VALUE_IS_SET_BY_CONFIGFILE,     // 'explicit' write by loading and processing a config file.
-		PARAM_VALUE_IS_SET_BY_ASSIGN,			    // 'indirect' write: value is copied over from elsewhere via operator=.
-		PARAM_VALUE_IS_SET_BY_PARAM,          // 'indirect' write: other Param's OnChange code set the param value, whatever it is now.
-		PARAM_VALUE_IS_SET_BY_APPLICATION,    // 'explicit' write: user / application code set the param value, whatever it is now.
-		PARAM_VALUE_IS_SET_BY_CORE_RUN,       // 'explicit' write by the running application core: before proceding with the next step the run-time adjusts this one, e.g. (incrementing) page number while processing a multi-page OCR run.
+		PARAM_VALUE_IS_SET_BY_PRESET,          // 'indirect' write: a tesseract 'preset' parameter set was invoked and that one set this one as part of the action.
+		PARAM_VALUE_IS_SET_BY_CONFIGFILE,      // 'explicit' write by loading and processing a config file.
+		PARAM_VALUE_IS_SET_BY_ASSIGN,		   // 'indirect' write: value is copied over from elsewhere via operator=.
+		PARAM_VALUE_IS_SET_BY_PARAM,           // 'indirect' write: other Param's OnChange code set the param value, whatever it is now.
+		PARAM_VALUE_IS_SET_BY_APPLICATION,     // 'explicit' write: user / application code set the param value, whatever it is now.
+		PARAM_VALUE_IS_SET_BY_CORE_RUN,        // 'explicit' write by the running application core: before proceding with the next step the run-time adjusts this one, e.g. (incrementing) page number while processing a multi-page OCR run.
 		PARAM_VALUE_IS_SET_BY_SNAPSHOT_REWIND, // 'explicit' write: parameter snapshot was rewound to a given snapshot/value.
 	};
 	DECL_FMT_FORMAT_PARAMENUMTYPE(ParamSetBySourceType);
@@ -133,25 +136,19 @@ namespace parameters {
 		;
 
 	template <typename T>
-	concept ParamAcceptableOtherType = !std::is_integral<T>::value
-		&& !std::is_base_of<bool, T>::value
-		&& !std::is_floating_point<T>::value
-		&& !std::is_base_of<char*, T>::value  // fails as per https://stackoverflow.com/questions/23986784/why-is-base-of-fails-when-both-are-just-plain-char-type
-		&& !std::is_same<char*, T>::value
-		&& !std::is_same<const char*, T>::value
-		//|| std::is_nothrow_convertible<char*, T>::value
-		//|| std::is_nothrow_convertible<const char*, T>::value
-		//|| std::is_nothrow_convertible<bool, T>::value || std::is_nothrow_convertible<double, T>::value || std::is_nothrow_convertible<int32_t, T>::value
-		&& !std::is_base_of<std::string, T>::value
-		;
+	concept ParamAcceptableOtherType = !ParamAcceptableValueType<T>;
 
 	static_assert(ParamAcceptableValueType<int>);
 	static_assert(ParamAcceptableValueType<double>);
 	static_assert(ParamAcceptableValueType<bool>);
 	static_assert(!ParamAcceptableValueType<const char *>);
 	static_assert(!ParamAcceptableValueType<char*>);
+	static_assert(!ParamAcceptableValueType<const wchar_t *>);
+	static_assert(!ParamAcceptableValueType<wchar_t*>);
 	static_assert(!ParamAcceptableValueType<std::string>);
 	static_assert(!ParamAcceptableValueType<std::string&>);
+	static_assert(!ParamAcceptableValueType<std::wstring>);
+	static_assert(!ParamAcceptableValueType<std::wstring&>);
 	static_assert(ParamAcceptableOtherType<ParamVoidPtrDataType>);
 	static_assert(ParamAcceptableOtherType<ParamArbitraryOtherType>);
 	static_assert(ParamAcceptableOtherType<ParamStringSetType>);
@@ -386,7 +383,7 @@ namespace parameters {
 		// When no source vector is specified, or when the source vector does not specify this
 		// particular parameter, then its value is reset to the default value which was
 		// specified earlier in its constructor.
-		virtual void ResetToDefault(const ParamsVectorSet *source_vec = 0, SOURCE_TYPE) = 0;
+		virtual void ResetToDefault(const ParamsVectorSet *source_vec = nullptr, SOURCE_TYPE) = 0;
 		void ResetToDefault(const ParamsVectorSet &source_vec, SOURCE_TYPE);
 
 		Param(const Param &o) = delete;
@@ -436,7 +433,7 @@ namespace parameters {
  * make sure that the copy and move constructors + operator= methods for the *final class* are matched, unless such a class is
  * only a `using` statement of a template instantiation.
  *
- * Hence we succumb to using preprocessor macros below instead, until someone better versed in C++ than me comes along a keeps thing readable; I didn't succeed
+ * Hence we succumb to using preprocessor macros below instead, until someone better versed in C++ than me comes along and keeps things readable; I didn't succeed
  * for the RefTypeParam-based StringSetParam and IntSetParam classes, so those are produced with some help from the preprocessor
  * instead.
  */
@@ -488,7 +485,7 @@ namespace parameters {
 		// When no source vector is specified, or when the source vector does not specify this
 		// particular parameter, then its value is reset to the default value which was
 		// specified earlier in its constructor.
-		virtual void ResetToDefault(const ParamsVectorSet *source_vec = 0, SOURCE_TYPE) override;
+		virtual void ResetToDefault(const ParamsVectorSet *source_vec = nullptr, SOURCE_TYPE) override;
 		using Param::ResetToDefault;
 
 		virtual std::string value_str(ValueFetchPurpose purpose) const override;
@@ -606,7 +603,7 @@ namespace parameters {
 		// When no source vector is specified, or when the source vector does not specify this
 		// particular parameter, then its value is reset to the default value which was
 		// specified earlier in its constructor.
-		virtual void ResetToDefault(const ParamsVectorSet *source_vec = 0, SOURCE_TYPE) override;
+		virtual void ResetToDefault(const ParamsVectorSet *source_vec = nullptr, SOURCE_TYPE) override;
 		using Param::ResetToDefault;
 
 		virtual std::string value_str(ValueFetchPurpose purpose) const override;
@@ -726,7 +723,7 @@ namespace parameters {
 		// When no source vector is specified, or when the source vector does not specify this
 		// particular parameter, then its value is reset to the default value which was
 		// specified earlier in its constructor.
-		virtual void ResetToDefault(const ParamsVectorSet *source_vec = 0, SOURCE_TYPE) override;
+		virtual void ResetToDefault(const ParamsVectorSet *source_vec = nullptr, SOURCE_TYPE) override;
 		using Param::ResetToDefault;
 
 		virtual std::string value_str(ValueFetchPurpose purpose) const override;
@@ -846,7 +843,7 @@ namespace parameters {
 		// When no source vector is specified, or when the source vector does not specify this
 		// particular parameter, then its value is reset to the default value which was
 		// specified earlier in its constructor.
-		virtual void ResetToDefault(const ParamsVectorSet *source_vec = 0, SOURCE_TYPE) override;
+		virtual void ResetToDefault(const ParamsVectorSet *source_vec = nullptr, SOURCE_TYPE) override;
 		using Param::ResetToDefault;
 
 		virtual std::string value_str(ValueFetchPurpose purpose) const override;
@@ -967,7 +964,7 @@ namespace parameters {
 		// When no source vector is specified, or when the source vector does not specify this
 		// particular parameter, then its value is reset to the default value which was
 		// specified earlier in its constructor.
-		virtual void ResetToDefault(const ParamsVectorSet *source_vec = 0, SOURCE_TYPE) override;
+		virtual void ResetToDefault(const ParamsVectorSet *source_vec = nullptr, SOURCE_TYPE) override;
 		using Param::ResetToDefault;
 
 		virtual std::string value_str(ValueFetchPurpose purpose) const override;
