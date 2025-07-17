@@ -188,9 +188,9 @@ namespace parameters {
 		is_params_owner_ = true;
 	}
 
-#define THE_4_HANDLERS_PROTO_4_SURPLUS(type)																								\
+#define THE_4_HANDLERS_PROTO_4_SURPLUS(type)																\
   const char *name, const char *comment, bool init,						                      				\
-	type::ParamOnModifyFunction on_modify_f, type::ParamOnValidateFunction on_validate_f,			\
+	type::ParamOnModifyFunction on_modify_f, type::ParamOnValidateFunction on_validate_f,					\
 			type::ParamOnParseFunction on_parse_f, type::ParamOnFormatFunction on_format_f
 
 

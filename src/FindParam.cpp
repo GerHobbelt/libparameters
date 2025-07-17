@@ -13,7 +13,6 @@ namespace parameters {
 
 
 
-	template<>
 	IntParam *FindParam(const char *name, ParamsVectorSet *globals, ParamsVectorSet *locals, const IntParam *DUMMY, ParamType accepted_types_mask) {
 		if (!globals)
 			globals = ::tesseract::GlobalParams();

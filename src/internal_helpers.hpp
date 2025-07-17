@@ -8,12 +8,6 @@
 
 namespace parameters {
 
-#define THE_4_HANDLERS_PROTO                                                    \
-  const char *name, const char *comment, ParamsVector &owner, bool init,        \
-  ParamOnModifyFunction on_modify_f, ParamOnValidateFunction on_validate_f,     \
-  ParamOnParseFunction on_parse_f, ParamOnFormatFunction on_format_f
-
-
 	// -- local helper functions --
 
 	using statistics_uint_t = decltype(Param::access_counts_t().reading);
@@ -38,7 +32,6 @@ namespace parameters {
 	}
 
 	// --- end of helper functions set ---
-
 
 }   // namespace
 

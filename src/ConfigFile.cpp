@@ -71,7 +71,7 @@ namespace parameters {
 					line.error = true;
 				}
 				// EOF reached? If we got *anything*, that'll be the last line in the file.
-				line.EOF_reached = feof(_f);
+				line.EOF_reached = !!feof(_f);
 				if (buf.length() > 0)
 					_lineno++;
 				break;

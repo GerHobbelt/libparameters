@@ -49,8 +49,8 @@ namespace parameters {
 
 #include <parameters/sourceref_defstart.h>
 
-// Hash table used internally as a database table, collecting the compiled-in parameter instances.
-// Used to speed up the various `find()` functions, among others.
+	// Hash table used internally as a database table, collecting the compiled-in parameter instances.
+	// Used to speed up the various `find()` functions, among others.
 	typedef std::unordered_map<
 		const char * /* key */,
 		ParamPtr /* value */,
@@ -85,7 +85,7 @@ namespace parameters {
 		// This feature is used, f.e., in tesseract when the command line parser collects the
 		// user-specified parameter values from the command line itself and various referenced or otherwise
 		// implicated configuration files: a 'muster set' of known compiled-in parameters is collected and cloned into such
-		// a 'owning' parameter vector, which is then passed on to the command line parser proper to use for both parameter name/type/value
+		// an 'owning' parameter vector, which is then passed on to the command line parser proper to use for both parameter name/type/value
 		// validations while parsing and storing the parsed values discovered.
 		// 
 		// It is used to collect, set up and then pass parameter vectors into the tesseract Init* instance
@@ -125,9 +125,9 @@ namespace parameters {
 
 	// --------------------------------------------------------------------------------------------------
 
-// A set (vector) of surplus parameters, i.e. parameters which are defined at run-time, rather than at compile-time.
-// This SurplusParamsVector class is the owner of each of these (heap allocated) parameters, which are created on demand
-// when calling the add() method.
+	// A set (vector) of surplus parameters, i.e. parameters which are defined at run-time, rather than at compile-time.
+	// This SurplusParamsVector class is the owner of each of these (heap allocated) parameters, which are created on demand
+	// when calling the add() method.
 	class SurplusParamsVector: public ParamsVector {
 	public:
 		SurplusParamsVector() = delete;
@@ -136,23 +136,17 @@ namespace parameters {
 
 		~SurplusParamsVector();
 
-#define THE_4_HANDLERS_PROTO(type)                                                                    \
-		type::ParamOnModifyFunction on_modify_f = 0, type::ParamOnValidateFunction on_validate_f = 0,			\
-			type::ParamOnParseFunction on_parse_f = 0, type::ParamOnFormatFunction on_format_f = 0
+		void add(const int32_t value, THE_4_HANDLERS_PROTO_4_SURPLUS(IntParam));
+		void add(const bool value, THE_4_HANDLERS_PROTO_4_SURPLUS(BoolParam));
+		void add(const double value, THE_4_HANDLERS_PROTO_4_SURPLUS(DoubleParam));
+		void add(const std::string &value, THE_4_HANDLERS_PROTO_4_SURPLUS(StringParam));
 
-		void add(const int32_t value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(IntParam));
-		void add(const bool value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(BoolParam));
-		void add(const double value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(DoubleParam));
-		void add(const std::string &value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(StringParam));
+		void add(const std::vector<int32_t> value, const BasicVectorParamParseAssistant &assistant, THE_4_HANDLERS_PROTO_4_SURPLUS(IntSetParam));
+		void add(const std::vector<bool> value, const BasicVectorParamParseAssistant &assistant, THE_4_HANDLERS_PROTO_4_SURPLUS(BoolSetParam));
+		void add(const std::vector<double> value, const BasicVectorParamParseAssistant &assistant, THE_4_HANDLERS_PROTO_4_SURPLUS(DoubleSetParam));
+		void add(const std::vector<std::string> &value, const BasicVectorParamParseAssistant &assistant, THE_4_HANDLERS_PROTO_4_SURPLUS(StringSetParam));
 
-		void add(const std::vector<int32_t> value, const BasicVectorParamParseAssistant &assistant, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(IntSetParam));
-		void add(const std::vector<bool> value, const BasicVectorParamParseAssistant &assistant, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(BoolSetParam));
-		void add(const std::vector<double> value, const BasicVectorParamParseAssistant &assistant, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(DoubleSetParam));
-		void add(const std::vector<std::string> &value, const BasicVectorParamParseAssistant &assistant, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(StringSetParam));
-
-		void add(const char *value, const char *name, const char *comment, bool init = false, THE_4_HANDLERS_PROTO(StringParam));
-
-#undef THE_4_HANDLERS_PROTO
+		void add(const char *value, THE_4_HANDLERS_PROTO_4_SURPLUS(StringParam));
 
 	protected:
 		void add(ParamPtr param_ref);
@@ -203,6 +197,27 @@ namespace parameters {
 	public:
 		friend class Snapshot;
 	};
+
+	// --------------------------------------------------------------------------------------------------
+
+	// template instances:
+
+	// ready-made template instances:
+	template <>
+	IntParam *ParamsVectorSet::find<IntParam>(
+			const char *name) const;
+	template <>
+	BoolParam *ParamsVectorSet::find<BoolParam>(
+			const char *name) const;
+	template <>
+	DoubleParam *ParamsVectorSet::find<DoubleParam>(
+			const char *name) const;
+	template <>
+	StringParam *ParamsVectorSet::find<StringParam>(
+			const char *name) const;
+	template <>
+	Param *ParamsVectorSet::find<Param>(
+			const char *name) const;
 
 	// --------------------------------------------------------------------------------------------------
 

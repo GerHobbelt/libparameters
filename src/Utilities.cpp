@@ -17,10 +17,10 @@ namespace parameters {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	bool ParamUtils::ReadParamsFile(ConfigReader &fp,
-																		const ParamsVectorSet &member_params,
-															 SurplusParamsVector *surplus,
-																		ParamSetBySourceType source_type,
-																		ParamPtr source) {
+									const ParamsVectorSet &member_params,
+									SurplusParamsVector *surplus,
+									ParamSetBySourceType source_type,
+									ParamPtr source) {
 		ConfigReader::line  line; // input line
 		bool anyerr = false;  // true if any error
 		bool foundit;         // found parameter

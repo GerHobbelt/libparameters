@@ -274,7 +274,7 @@ namespace parameters {
 			_contentsize = 0;
 		}
 
-		// move the active content to the start of the buffer, i.e. remove the current shoft.
+		// move the active content to the start of the buffer, i.e. remove the current shift.
 		void unshift_content() {
 			if (_str_start_offset == 0)
 				return;

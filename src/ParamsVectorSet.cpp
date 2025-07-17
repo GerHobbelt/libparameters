@@ -72,6 +72,8 @@ namespace parameters {
 		return nullptr;
 	}
 
+	// ready-made template instances:
+
 	template <>
 	IntParam *ParamsVectorSet::find<IntParam>(
 		const char *name

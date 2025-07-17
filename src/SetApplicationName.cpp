@@ -27,9 +27,7 @@ namespace parameters {
 					// On WinXP, if path length >= bufsize, the output is truncated and NOT
 					// null-terminated.  On Vista and later, it will null-terminate the
 					// truncated string. We call ReleaseBuffer on all OSes to be safe.
-					pathlen = ::GetModuleFileNameA(NULL,
-																				 buffer,
-																				 bufsize);
+					pathlen = ::GetModuleFileNameA(NULL, buffer, bufsize);
 					if (pathlen > 0 && pathlen < bufsize - 1)
 						break;
 

@@ -34,10 +34,7 @@ namespace parameters {
 		//
 		// Variable names are followed by one of more whitespace characters,
 		// followed by the Value, which spans the rest of line.
-		static bool ReadParamsFile(ConfigReader &fp,
-																 const ParamsVectorSet &set,
-															 SurplusParamsVector *surplus,
-																 SOURCE_REF);
+		static bool ReadParamsFile(ConfigReader &fp, const ParamsVectorSet &set, SurplusParamsVector *surplus, SOURCE_REF);
 
 		/**
 		 * The default application source_type starts out as PARAM_VALUE_IS_SET_BY_ASSIGN.

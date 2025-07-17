@@ -81,5 +81,14 @@ namespace parameters {
 		return (!*s); // string must be at the end now...
 	}
 
+	static inline void clear_errno(void) {
+		// https://stackoverflow.com/questions/25315191/need-to-clean-up-errno-before-calling-function-then-checking-errno?rq=3
+#if defined(_MSC_VER)
+		_set_errno(E_OK);
+#else
+		errno = E_OK;
+#endif
+	}
+
 }   // namespace
 
