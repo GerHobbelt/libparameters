@@ -6,8 +6,6 @@
 
 #include <parameters/parameters.h>
 
-#include "internal_helpers.hpp"
-
 #include <iostream>
 #include <format>
 #include <cassert>

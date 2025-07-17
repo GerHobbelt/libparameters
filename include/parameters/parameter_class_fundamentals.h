@@ -68,6 +68,75 @@ namespace parameters {
 		return fmt::underlying(t);
 	}
 
+	enum ValueFetchPurpose : int {
+		// Fetches the (raw, parseble for re-use via set_value()) value of the param as a string and does not add
+		// this access to the read counter tally. This is useful, f.e., when checking 
+		// parameters' values before deciding to modify them via a CLI, UI interface or config file (re)load.
+		//
+		// We do not count this read access as this method is for *validation/comparison* purposes only and we do not
+		// wish to tally those together with the actual work code accessing this parameter through
+		// the other functions: set_value() and assignment operators.
+		VALSTR_PURPOSE_RAW_DATA_4_INSPECT,
+
+		// Fetches the (formatted for print/display) value of the param as a string and does not add
+		// this access to the read counter tally. This is useful, f.e., when printing 'init'
+		// (only-settable-before-first-use) parameters to config file or log file, independent
+		// from the actual work process.
+		//
+		// We do not count this read access as this method is for *display* purposes only and we do not
+		// wish to tally those together with the actual work code accessing this parameter through
+		// the other functions: set_value() and assignment operators.
+		VALSTR_PURPOSE_DATA_FORMATTED_4_DISPLAY,
+
+		// Fetches the (raw, parseble for re-use via set_value() for storing to serialized text data format files) value of the param as a string and DOES add
+		// this access to the read counter tally. This is useful, f.e., when printing 'init'
+		// (only-settable-before-first-use) parameters to config file, independent
+		// from the actual work process.
+		//
+		// We do not count this read access as this method is for *validation/comparison* purposes only and we do not
+		// wish to tally those together with the actual work code accessing this parameter through
+		// the other functions: set_value() and assignment operators.
+		VALSTR_PURPOSE_DATA_4_USE,
+
+		// Fetches the (raw, parseble for re-use via set_value()) default value of the param as a string and does not add
+		// this access to the read counter tally. This is useful, f.e., when checking
+		// parameters' values before deciding to modify them via a CLI, UI interface or config file (re)load.
+		//
+		// We do not count this read access as this method is for *validation/comparison* purposes only and we do not
+		// wish to tally those together with the actual work code accessing this parameter through
+		// the other functions: set_value() and assignment operators.
+		VALSTR_PURPOSE_RAW_DEFAULT_DATA_4_INSPECT,
+
+		// Fetches the (formatted for print/display) default value of the param as a string and does not add
+		// this access to the read counter tally. This is useful, f.e., when printing 'init'
+		// (only-settable-before-first-use) parameters to config file or log file, independent
+		// from the actual work process.
+		//
+		// We do not count this read access as this method is for *display* purposes only and we do not
+		// wish to tally those together with the actual work code accessing this parameter through
+		// the other functions: set_value() and assignment operators.
+		VALSTR_PURPOSE_DEFAULT_DATA_FORMATTED_4_DISPLAY,
+
+		// Return string representing the type of the parameter value, e.g. "integer"
+		//
+		// We do not count this read access as this method is for *print/write-to-file* purposes only and we do not
+		// wish to tally those together with the actual work code accessing this parameter through
+		// the other functions: set_value() and assignment operators.
+		VALSTR_PURPOSE_TYPE_INFO_4_INSPECT,
+
+		// Return string representing the type of the parameter value, e.g. "integer"
+		//
+		// We do not count this read access as this method is for *display* purposes only and we do not
+		// wish to tally those together with the actual work code accessing this parameter through
+		// the other functions: set_value() and assignment operators.
+		VALSTR_PURPOSE_TYPE_INFO_4_DISPLAY,
+	};
+	DECL_FMT_FORMAT_PARAMENUMTYPE(ValueFetchPurpose);
+
+	static inline auto format_as(ValueFetchPurpose t) {
+		return fmt::underlying(t);
+	}
+
 	// --------------------------------------------------------------------------------------------------
 
 	// Readability helper types: reference and pointer to `Param` base class.

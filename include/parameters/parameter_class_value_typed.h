@@ -56,7 +56,7 @@ namespace parameters {
 		// Return the formatted string value, depending on the formatting purpose. The format handler is not supposed to modify any read/write/modify access accounting data.
 		// This formatting action is supposed to always succeed or fail fatally (e.g. out of heap memory) by throwing an exception.
 		// The formatter implementation is not supposed to signal any errors via the fault() API method.
-		typedef std::string ParamOnFormatCFunction(const RTP &source, const T value, const T default_value, ValueFetchPurpose purpose);
+		typedef std::string ParamOnFormatCFunction(RTP &source, const T value, const T default_value, ValueFetchPurpose purpose);
 
 		using ParamOnModifyFunction = std::function<ParamOnModifyCFunction>;
 		using ParamOnValidateFunction = std::function<ParamOnValidateCFunction>;
@@ -84,6 +84,23 @@ namespace parameters {
 		//void operator=(const T *value);
 
 		const T operator () (void) const noexcept;
+
+#if defined(CLI11_VERSION)
+		CLI::callback_t as_CLI11_lambda() noexcept {
+			return [this](CLI::results_t res) {
+				if (res.size() != 1)
+					return false;
+				T v;
+				bool worked = CLI::detail::lexical_cast(res[0], v);
+				if (worked) {
+					this->set_value(v, PARAM_VALUE_IS_SET_BY_COMMANDLINE);
+				}
+				return worked;
+			};
+		}
+
+		//[](std::vector<std::string> val) -> bool
+#endif
 
 		// Produce a reference to the parameter-internal assistant instance.
 		// 

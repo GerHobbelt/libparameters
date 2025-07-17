@@ -14,8 +14,6 @@
 
 #include "monolithic_examples.h"
 
-#include "internal_helpers.hpp"
-
 #include <iostream>
 #include <format>
 
@@ -43,12 +41,7 @@ int main(int argc, const char **argv) {
 #if 0
 	app.add_option("-o", option1, "Parameter");
 #else
-	app.add_option("-o", [](std::vector<std::string> val) {
-		if (val.size() != 1)
-			return false;
-		option1.set_value(val[0], PARAM_VALUE_IS_SET_BY_COMMANDLINE);
-		return true;
-	}, "Parameter");
+	app.add_option("-o", option1.as_CLI11_lambda(), "Parameter");
 #endif
 
 	//bool flag_bool;

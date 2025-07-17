@@ -53,12 +53,14 @@ const char *name, const char *comment, ParamsVector &owner, bool init,
 #endif
 
 #define MK_CONSTRUCTORS(XYZTypedParam, value_arg_decl)																												\
-XYZTypedParam(value_arg_decl, const char *name, const char *comment, ParamsVector &owner, bool init = false, TheEventHandlers userdef_handlers = {});				\
+XYZTypedParam(value_arg_decl, const char *name, const char *comment, ParamsVector &owner, bool init, TheEventHandlers userdef_handlers = {});						\
+XYZTypedParam(value_arg_decl, const char *name, const char *comment, ParamsVector &owner, TheEventHandlers userdef_handlers = {});									\
 XYZTypedParam(value_arg_decl, const char *name, const char *comment, bool init, TheEventHandlers userdef_handlers = {});											\
 XYZTypedParam(value_arg_decl, const char *name, const char *comment, TheEventHandlers userdef_handlers = {})
 
 #define MK_EXPLICIT_CONSTRUCTORS(XYZTypedParam, value_arg_decl)																										\
-explicit XYZTypedParam(value_arg_decl, const char *name, const char *comment, ParamsVector &owner, bool init = false, TheEventHandlers userdef_handlers = {});		\
+explicit XYZTypedParam(value_arg_decl, const char *name, const char *comment, ParamsVector &owner, bool init, TheEventHandlers userdef_handlers = {});				\
+explicit XYZTypedParam(value_arg_decl, const char *name, const char *comment, ParamsVector &owner, TheEventHandlers userdef_handlers = {});							\
 explicit XYZTypedParam(value_arg_decl, const char *name, const char *comment, bool init, TheEventHandlers userdef_handlers = {});									\
 explicit XYZTypedParam(value_arg_decl, const char *name, const char *comment, TheEventHandlers userdef_handlers = {})
 
