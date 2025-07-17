@@ -1,5 +1,5 @@
 
-// var c
+// var e
 
 #include <parameters/parameters.h>
 
@@ -8,4 +8,4 @@
 using namespace parameters;
 
 // declare a parameter instance (variable) and hook it up to the global set:
-IntParam c(42, "c", "example variable `c`");
+StringParam e("foobar", "e", "example variable `e`");

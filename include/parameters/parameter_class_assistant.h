@@ -29,6 +29,8 @@ namespace parameters {
 		bool parse_trims_surrounding_whitespace{true};  //< the string parse handler will trim any whitespace occurring before or after every value stored in the string.
 	};
 
+	// --------------------------------------------------------------------------------------------------
+
 	struct BasicValueParamParseAssistant {
 		// For formatting the value for data serialization / save purposes, the generated value may be wrapped in a prefix and postfix, e.g. "{" and "}".
 		std::string fmt_data_prefix{""};
@@ -41,6 +43,8 @@ namespace parameters {
 		bool parse_should_cope_with_fmt_display_prefixes{true}; //< when true, the registered string parse handler is supposed to be able to cope with encountering the format display-output prefix and prefix strings.
 		bool parse_trims_surrounding_whitespace{true};  //< the string parse handler will trim any whitespace occurring before or after every value stored in the string.
 	};
+
+	// --------------------------------------------------------------------------------------------------
 
 	struct BasicStringParamParseAssistant {
 		// For formatting the value for data serialization / save purposes, the generated value may be wrapped in a prefix and postfix, e.g. "{" and "}".

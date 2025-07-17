@@ -15,6 +15,12 @@
 
 #include "d.cpp"
 
+#include "e.cpp"
+
+#include "f.cpp"
+
+#include "g.cpp"
+
 #define SINGLE_SOURCE_DEMO 1
 #include "upani-main.cpp"
 

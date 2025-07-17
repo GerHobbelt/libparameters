@@ -23,11 +23,11 @@ using namespace parameters;
 
 namespace {
 
-	BoolParam flag1(false, "f1", "bla bla bla bla", GlobalParams());
-	IntParam flag2(999, "f2", "bla bla bla bla", GlobalParams());
-	BoolParam flag3(false, "f3", "bla bla bla bla", GlobalParams());
+	BoolParam flag1(false, "f1", "bla bla bla bla");
+	IntParam flag2(999, "f2", "bla bla bla bla");
+	BoolParam flag3(false, "f3", "bla bla bla bla");
 
-	IntParam option1(42, "opt1", "bla bla bla bla", GlobalParams());
+	IntParam option1(42, "opt1", "bla bla bla bla");
 
 } // namespace 
 
@@ -40,7 +40,16 @@ int main(int argc, const char **argv) {
 	CLI::App app{"App description"};
 
 	// Define options
+#if 0
 	app.add_option("-o", option1, "Parameter");
+#else
+	app.add_option("-o", [](std::vector<std::string> val) {
+		if (val.size() != 1)
+			return false;
+		option1.set_value(val[0], PARAM_VALUE_IS_SET_BY_COMMANDLINE);
+		return true;
+	}, "Parameter");
+#endif
 
 	//bool flag_bool;
 	app.add_flag("--bool,-b", flag1, "This is a bool flag");

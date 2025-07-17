@@ -8,4 +8,4 @@
 using namespace parameters;
 
 // declare a parameter instance (variable) and hook it up to the global set:
-DoubleParam d(3.1415, "d", "example variable `d`", GlobalParams());
+DoubleParam d(3.1415, "d", "example variable `d`");

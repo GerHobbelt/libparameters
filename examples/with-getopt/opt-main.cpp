@@ -16,9 +16,9 @@ using namespace parameters;
 
 namespace {
 
-	BoolParam flag1(false, "f1", "bla bla bla bla", GlobalParams());
-	IntParam flag2(999, "f2", "bla bla bla bla", GlobalParams());
-	StringParam flag3("bugger", "f3", "bla bla bla bla", GlobalParams());
+	BoolParam flag1(false, "f1", "bla bla bla bla");
+	IntParam flag2(999, "f2", "bla bla bla bla");
+	StringParam flag3("bugger", "f3", "bla bla bla bla");
 
 #if 0
 	struct option opts[] = {

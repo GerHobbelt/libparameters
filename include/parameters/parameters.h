@@ -11,6 +11,7 @@
 #include <parameters/parameter_sets.h>
 #include <parameters/parameter_snapshots.h>
 #include <parameters/parameter_globals.h>
+#include <parameters/parameter_class_assistant.h>
 #include <parameters/utilities.h>
 #include <parameters/configreader.h>
 #include <parameters/reportwriter.h>

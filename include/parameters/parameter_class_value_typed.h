@@ -63,18 +63,27 @@ namespace parameters {
 		using ParamOnParseFunction = std::function<ParamOnParseCFunction>;
 		using ParamOnFormatFunction = std::function<ParamOnFormatCFunction>;
 
+		struct TheEventHandlers {
+			ParamOnModifyFunction on_modify_f{0};
+			ParamOnValidateFunction on_validate_f{0};
+			ParamOnParseFunction on_parse_f{0};
+			ParamOnFormatFunction on_format_f{0};
+		};
+
 	public:
-		ValueTypedParam(const char *value, const Assistant &assist, THE_4_HANDLERS_PROTO);
-		ValueTypedParam(const T value, const Assistant &assist, THE_4_HANDLERS_PROTO);
-		explicit ValueTypedParam(const T *value, const Assistant &assist, THE_4_HANDLERS_PROTO);
+		MK_CONSTRUCTORS(ValueTypedParam, const char *value);
+		MK_CONSTRUCTORS(ValueTypedParam, const T value);
+		MK_EXPLICIT_CONSTRUCTORS(ValueTypedParam, const T *value);
 		virtual ~ValueTypedParam() = default;
 
-		operator T() const;
-		operator const T&() const;
+		operator T() const noexcept;
+		//operator const T&() const noexcept;  //--> including this one will result in compiler errors about "ambiguous conversion"
 		//operator const T *() const;
 		void operator=(const T value);
-		void operator=(const T &value);
+		//void operator=(const T &value);      //--> including this one will result in compiler errors about "operator= is ambiguous"
 		//void operator=(const T *value);
+
+		const T operator () (void) const noexcept;
 
 		// Produce a reference to the parameter-internal assistant instance.
 		// 

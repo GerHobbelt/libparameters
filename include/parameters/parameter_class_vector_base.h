@@ -64,17 +64,27 @@ namespace parameters {
 		using ParamOnParseFunction = std::function<ParamOnParseCFunction>;
 		using ParamOnFormatFunction = std::function<ParamOnFormatCFunction>;
 
+		struct TheEventHandlers {
+			ParamOnModifyFunction on_modify_f{0};
+			ParamOnValidateFunction on_validate_f{0};
+			ParamOnParseFunction on_parse_f{0};
+			ParamOnFormatFunction on_format_f{0};
+		};
+
 	public:
-		BasicVectorTypedParam(const char *value, const Assistant &assist, THE_4_HANDLERS_PROTO);
-		BasicVectorTypedParam(const VecT &value, const Assistant &assist, THE_4_HANDLERS_PROTO);
+		MK_CONSTRUCTORS(BasicVectorTypedParam, const char *value);
+		MK_CONSTRUCTORS(BasicVectorTypedParam, const VecT &value);
+		MK_EXPLICIT_CONSTRUCTORS(BasicVectorTypedParam, const VecT *value);
 		virtual ~BasicVectorTypedParam() = default;
 
 		// operator T() const;
-		operator const VecT &() const;
-		operator const VecT *() const;
+		operator const VecT &() const noexcept;
+		operator const VecT *() const noexcept;
 		// void operator=(T value);
 		void operator=(const VecT &value);
 		void operator=(const VecT *value);
+
+		const VecT& operator () (void) const noexcept;
 
 		// Produce a reference to the parameter-internal assistant instance.
 		//

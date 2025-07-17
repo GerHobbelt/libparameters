@@ -8,4 +8,4 @@
 using namespace parameters;
 
 // declare a parameter instance (variable) and hook it up to the global set:
-BoolParam a(false, "a", "example variable `a`", GlobalParams());
+BoolParam a(false, "a", "example variable `a`");

@@ -63,18 +63,27 @@ namespace parameters {
 		using ParamOnParseFunction = std::function<ParamOnParseCFunction>;
 		using ParamOnFormatFunction = std::function<ParamOnFormatCFunction>;
 
+		struct TheEventHandlers {
+			ParamOnModifyFunction on_modify_f{0};
+			ParamOnValidateFunction on_validate_f{0};
+			ParamOnParseFunction on_parse_f{0};
+			ParamOnFormatFunction on_format_f{0};
+		};
+
 	public:
-		RefTypedParam(const char *value, const Assistant &assist, THE_4_HANDLERS_PROTO);
-		RefTypedParam(const T &value, const Assistant &assist, THE_4_HANDLERS_PROTO);
-		explicit RefTypedParam(const T *value, const Assistant &assist, THE_4_HANDLERS_PROTO);
-		virtual ~RefTypedParam();
+		MK_CONSTRUCTORS(RefTypedParam, const char *value);
+		MK_CONSTRUCTORS(RefTypedParam, T &value);
+		MK_EXPLICIT_CONSTRUCTORS(RefTypedParam, T *value);
+		virtual ~RefTypedParam() = default;
 
 		//operator T() const;
-		operator const T&() const;
-		operator const T *() const;
+		operator const T&() const noexcept;
+		operator const T *() const noexcept;
 		//void operator=(T value);
 		void operator=(const T &value);
 		void operator=(const T *value);
+
+		const T& operator () (void) const noexcept;
 
 		// Produce a reference to the parameter-internal assistant instance.
 		// 

@@ -37,11 +37,12 @@ int main(void) {
 	// thanks to type propagation, we should observe the `rv` type to have become `double`:
 	static_assert(std::is_arithmetic<decltype(rv)>::value);
 	static_assert(std::is_floating_point<decltype(rv)>::value);
+	rv += f().x;
 
 	auto& list = GlobalParams();
 	auto lst = list.as_list();
 
-	std::cout << std::format("Demo:\n\nWe expect to have calculated a value that's very close to 31415: {}\n\n", rv);
+	std::cout << std::format("Demo:\n\nWe expect to have calculated a value that's very close to 31418: {}\n\n", rv);
 	std::cout << "\nWe also expect to see only 2 variables listed:\n";
 	for (auto el : lst) {
 		std::cout << std::format("var name: {}\n", el->name_str());
