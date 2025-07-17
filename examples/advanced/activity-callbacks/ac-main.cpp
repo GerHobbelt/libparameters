@@ -12,6 +12,8 @@ using namespace parameters;
 
 namespace {
 
+	IntParam var(42, "var", "bla bla bla bla", GlobalParams(), );
+
 	//
 	// STAGE #1
 	// 

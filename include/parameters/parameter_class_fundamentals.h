@@ -55,6 +55,7 @@ namespace parameters {
 		PARAM_VALUE_IS_RESET,
 		PARAM_VALUE_IS_SET_BY_PRESET,          // 'indirect' write: a tesseract 'preset' parameter set was invoked and that one set this one as part of the action.
 		PARAM_VALUE_IS_SET_BY_CONFIGFILE,      // 'explicit' write by loading and processing a config file.
+		PARAM_VALUE_IS_SET_BY_COMMANDLINE,     // 'explicit' write by the (external) command line parser.
 		PARAM_VALUE_IS_SET_BY_ASSIGN,		   // 'indirect' write: value is copied over from elsewhere via operator=.
 		PARAM_VALUE_IS_SET_BY_PARAM,           // 'indirect' write: other Param's OnChange code set the param value, whatever it is now.
 		PARAM_VALUE_IS_SET_BY_APPLICATION,     // 'explicit' write: user / application code set the param value, whatever it is now.

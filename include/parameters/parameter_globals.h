@@ -20,7 +20,7 @@ namespace parameters {
 	//
 	// TODO(daria): remove GlobalParams() when all global Tesseract
 	// parameters are converted to members.
-	ParamsVector &GlobalParams();
+	ParamsVector &GlobalParams(void);
 
 } // namespace 
 
