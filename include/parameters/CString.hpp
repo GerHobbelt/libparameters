@@ -14,7 +14,7 @@
 #ifndef _LIB_PARAMS_CSTRING_H_
 #define _LIB_PARAMS_CSTRING_H_
 
-#include <libassert/assert.hpp>
+#include <libassert/assert.h>
 #include <cstdint>
 #include <string>
 #include <ctype.h>

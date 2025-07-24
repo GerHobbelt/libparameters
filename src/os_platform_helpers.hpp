@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <libassert/assert.hpp>		// we use libassert for our assertions
+#include <libassert/assert.h>		// we use libassert for our assertions
 
 #include <fmt/base.h>
 #include <fmt/format.h>
