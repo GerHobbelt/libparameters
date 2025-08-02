@@ -23,7 +23,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Design Notes.md",
+                "file": "libparameters Design Specification.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -38,7 +38,7 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "Design Notes"
+              "title": "libparameters Design Specification"
             }
           }
         ],
@@ -115,7 +115,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Design Notes.md",
+                "file": "libparameters Design Specification.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -125,7 +125,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for Design Notes"
+              "title": "Backlinks for libparameters Design Specification"
             }
           },
           {
@@ -134,12 +134,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Design Notes.md",
+                "file": "libparameters Design Specification.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from Design Notes"
+              "title": "Outgoing links from libparameters Design Specification"
             }
           },
           {
@@ -163,13 +163,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Design Notes.md",
+                "file": "libparameters Design Specification.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Design Notes"
+              "title": "Outline of libparameters Design Specification"
             }
           }
         ]
@@ -193,7 +193,7 @@
   },
   "active": "61ed6e8b050866d7",
   "lastOpenFiles": [
-    "libparameters Design Specification.md",
-    "Design Notes.md"
+    "Design Notes.md",
+    "libparameters Design Specification.md"
   ]
 }
